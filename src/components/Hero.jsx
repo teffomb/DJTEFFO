@@ -173,7 +173,8 @@ const Hero = () => {
               to="/pricing"
               className="btn-primary text-lg px-8 py-4 flex items-center space-x-2"
             >
-              <i className="fas fa-dollar-sign"></i>
+              {/* Cambiado: usar texto S/. en lugar del icono de dólar */}
+              <span className="inline-flex items-center justify-center text-xl leading-none">S/.</span>
               <span>Ver Precios</span>
             </Link>
             
@@ -181,7 +182,10 @@ const Hero = () => {
               to="/contact"
               className="btn-secondary text-lg px-8 py-4 flex items-center space-x-2"
             >
-              <i className="fas fa-envelope"></i>
+              {/* Ajuste: envolver el icono en un inline-flex para centrarlo verticalmente */}
+              <span className="inline-flex items-center justify-center text-xl leading-none" aria-hidden="true">
+                <i className="fas fa-envelope"></i>
+              </span>
               <span>Contáctame</span>
             </Link>
           </motion.div>
