@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import React, { useState, useEffect, useRef } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
+  const navRef = useRef(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,15 +18,37 @@ const Navbar = () => {
   }, [])
 
   const navItems = [
-    { name: 'Inicio', path: '/' },
-    { name: 'Servicios', path: '/#services' },
-    { name: 'Galería', path: '/#gallery' },
-    { name: 'Precios', path: '/pricing' },
-    { name: 'Contacto', path: '/contact' }
+    { name: 'Inicio', path: '/', type: 'route' },
+    { name: 'Servicios', path: '#services', type: 'anchor' },
+    { name: 'Galería', path: '#gallery', type: 'anchor' },
+    { name: 'Precios', path: '/pricing', type: 'route' },
+    { name: 'Contacto', path: '/contact', type: 'route' }
   ]
+
+  const scrollToId = (id) => {
+    const el = document.getElementById(id)
+    if (!el) return
+    const navHeight = navRef.current ? navRef.current.offsetHeight : 80
+    const top = el.getBoundingClientRect().top + window.pageYOffset - navHeight - 10
+    window.scrollTo({ top, behavior: 'smooth' })
+    try { window.history.replaceState(null, '', `#${id}`) } catch (e) {}
+  }
+
+  const handleAnchorClick = (e, path) => {
+    e.preventDefault()
+    setIsOpen(false)
+    const id = path.replace('#', '')
+    if (location.pathname !== '/') {
+      navigate('/')
+      setTimeout(() => scrollToId(id), 150)
+    } else {
+      scrollToId(id)
+    }
+  }
 
   return (
     <motion.nav
+      ref={navRef}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -45,17 +69,45 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`text-sm font-medium transition-colors duration-300 hover:text-dj-gold ${
-                  location.pathname === item.path ? 'text-dj-gold' : 'text-white'
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isActive = item.type === 'route'
+                ? location.pathname === item.path
+                : location.hash === item.path
+
+              if (item.type === 'route') {
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    onClick={() => {
+                      setIsOpen(false)
+                      // Si ya estamos en la misma ruta, hacer scroll arriba
+                      if (location.pathname === item.path) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }
+                    }}
+                    className={`text-sm font-medium transition-colors duration-300 hover:text-dj-gold ${
+                      isActive ? 'text-dj-gold' : 'text-white'
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                )
+              }
+
+              return (
+                <a
+                  key={item.name}
+                  href={item.path}
+                  onClick={(e) => handleAnchorClick(e, item.path)}
+                  className={`text-sm font-medium transition-colors duration-300 hover:text-dj-gold ${
+                    isActive ? 'text-dj-gold' : 'text-white'
+                  }`}
+                >
+                  {item.name}
+                </a>
+              )
+            })}
           </div>
 
           {/* Mobile Menu Button */}
@@ -77,18 +129,44 @@ const Navbar = () => {
           className="md:hidden overflow-hidden bg-dj-gray/95 backdrop-blur-sm"
         >
           <div className="py-4 space-y-4">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                onClick={() => setIsOpen(false)}
-                className={`block px-4 py-2 text-sm font-medium transition-colors duration-300 hover:text-dj-gold ${
-                  location.pathname === item.path ? 'text-dj-gold' : 'text-white'
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isActive = item.type === 'route'
+                ? location.pathname === item.path
+                : location.hash === item.path
+
+              if (item.type === 'route') {
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    onClick={() => {
+                      setIsOpen(false)
+                      if (location.pathname === item.path) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }
+                    }}
+                    className={`block px-4 py-2 text-sm font-medium transition-colors duration-300 hover:text-dj-gold ${
+                      isActive ? 'text-dj-gold' : 'text-white'
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                )
+              }
+
+              return (
+                <a
+                  key={item.name}
+                  href={item.path}
+                  onClick={(e) => handleAnchorClick(e, item.path)}
+                  className={`block px-4 py-2 text-sm font-medium transition-colors duration-300 hover:text-dj-gold ${
+                    isActive ? 'text-dj-gold' : 'text-white'
+                  }`}
+                >
+                  {item.name}
+                </a>
+              )
+            })}
           </div>
         </motion.div>
       </div>
@@ -96,4 +174,4 @@ const Navbar = () => {
   )
 }
 
-export default Navbar 
+export default Navbar

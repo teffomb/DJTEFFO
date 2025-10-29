@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import About from './components/About'
 import Services from './components/Services'
 import Gallery from './components/Gallery'
-import Testimonials from './components/Testimonials'
 import Pricing from './components/Pricing'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
@@ -15,7 +14,6 @@ function App() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simular tiempo de carga
     setTimeout(() => setLoading(false), 1000)
   }, [])
 
@@ -39,9 +37,52 @@ function App() {
     )
   }
 
+  function ScrollManager() {
+    const location = useLocation()
+
+    useEffect(() => {
+      if (location.hash) {
+        const id = location.hash.replace('#', '')
+        let attempts = 0
+        const maxAttempts = 20
+        const intervalMs = 150
+        let timer = null
+
+        const tryScroll = () => {
+          attempts += 1
+          const el = document.getElementById(id)
+          if (el) {
+            const nav = document.querySelector('nav')
+            const navHeight = nav ? nav.offsetHeight : 80
+            const top = el.getBoundingClientRect().top + window.pageYOffset - navHeight - 10
+            window.scrollTo({ top, behavior: 'smooth' })
+            clearInterval(timer)
+          } else if (attempts >= maxAttempts) {
+            clearInterval(timer)
+          }
+        }
+
+        timer = setInterval(tryScroll, intervalMs)
+        tryScroll()
+        return () => clearInterval(timer)
+      }
+
+      const scrollTop = () => {
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }, 30)
+      }
+
+      scrollTop()
+    }, [location.pathname, location.hash])
+
+    return null
+  }
+
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <div className="App">
+        <ScrollManager />
         <Navbar />
         <AnimatePresence mode="wait">
           <Routes>
@@ -68,4 +109,4 @@ function App() {
   )
 }
 
-export default App 
+export default App
