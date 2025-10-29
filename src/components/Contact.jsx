@@ -69,8 +69,8 @@ const Contact = () => {
     {
       icon: 'fas fa-phone',
       title: 'Teléfono',
-      value: '+51 999442078',
-      action: 'tel:+51999442078'
+      value: '+51 922798039',
+      action: 'tel:+51922798039'
     },
     {
       icon: 'fas fa-envelope',
@@ -368,4 +368,4 @@ const Contact = () => {
   )
 }
 
-export default Contact 
+export default Contact

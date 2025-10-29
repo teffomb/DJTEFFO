@@ -154,7 +154,7 @@ const Footer = () => {
                     <i className="fas fa-phone text-dj-dark text-sm"></i>
                   </div>
                   <span className="text-gray-300 text-sm">
-                    +51 999442078
+                    +51 922798039
                   </span>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -255,4 +255,4 @@ const Footer = () => {
   )
 }
 
-export default Footer 
+export default Footer

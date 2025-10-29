@@ -9,6 +9,7 @@
   
   body {
     @apply bg-dj-dark text-white font-body;
+    overflow-x: hidden;
   }
 }
 
@@ -36,6 +37,83 @@
   .card-hover {
     @apply transition-all duration-300 hover:transform hover:scale-105 hover:shadow-2xl;
   }
+
+  /* Efecto glow de colores para la zona Hero */
+  .hero {
+    position: relative;
+    /* ensure stacking context */
+    isolation: isolate;
+
+    /* variables posicionables (se actualizarán desde JS) */
+    --pos1-x: 15%;
+    --pos1-y: 20%;
+    --pos2-x: 80%;
+    --pos2-y: 70%;
+    --pos3-x: 40%;
+    --pos3-y: 80%;
+    --pos4-x: 75%;
+    --pos4-y: 25%;
+    --glow-blur: 40px;
+  }
+
+  .hero::before,
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    /* restaurar transiciones al estado anterior al suavizado */
+    transition: opacity 400ms ease, transform 600ms cubic-bezier(.2,.9,.2,1), filter 600ms ease;
+    mix-blend-mode: screen;
+    filter: blur(var(--glow-blur));
+    z-index: 1;
+  }
+
+  /* Usar variables para posicionar los focos de color */
+  .hero::before {
+    background: radial-gradient(30% 30% at var(--pos1-x) var(--pos1-y), rgba(255,215,0,0.9), rgba(255,215,0,0) 25%),
+                radial-gradient(20% 20% at var(--pos2-x) var(--pos2-y), rgba(0,200,255,0.6), rgba(0,200,255,0) 30%);
+    transform: scale(0.95) translateZ(0);
+  }
+
+  .hero::after {
+    background: radial-gradient(25% 25% at var(--pos3-x) var(--pos3-y), rgba(0,230,200,0.45), rgba(0,230,200,0) 30%),
+                radial-gradient(30% 30% at var(--pos4-x) var(--pos4-y), rgba(255,180,0,0.45), rgba(255,180,0,0) 30%);
+    transform: scale(0.98) translateZ(0);
+  }
+
+  /* Mostrar glow cuando el script marca active (mejor control que solo :hover) */
+  .hero[data-active="true"]::before,
+  .hero[data-active="true"]::after {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+  }
+
+  /* Pequeñas diferencias estéticas según el lado del cursor */
+  .hero[data-side="left"]::before {
+    filter: blur(36px);
+    transform: translateX(-6%) scale(1);
+  }
+  .hero[data-side="left"]::after {
+    filter: blur(44px);
+    transform: translateX(-2%) scale(1);
+  }
+
+  .hero[data-side="right"]::before {
+    filter: blur(44px);
+    transform: translateX(6%) scale(1);
+  }
+  .hero[data-side="right"]::after {
+    filter: blur(36px);
+    transform: translateX(2%) scale(1);
+  }
+
+  /* Asegurar que el contenido del hero esté por encima del glow */
+  .hero > .container-custom {
+    position: relative;
+    z-index: 10;
+  }
 }
 
 /* Scrollbar personalizada */
@@ -54,4 +132,4 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #FFA500;
-} 
+}

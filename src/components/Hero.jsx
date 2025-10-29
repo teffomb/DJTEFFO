@@ -1,14 +1,93 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
 const Hero = () => {
+  const heroRef = useRef(null)
+
+  useEffect(() => {
+    const el = heroRef.current
+    if (!el) return
+
+    // Presets estáticos para cada mitad (no siguen el cursor)
+    const presets = {
+      left: {
+        '--pos1-x': '15%',
+        '--pos1-y': '20%',
+        '--pos2-x': '30%',
+        '--pos2-y': '70%',
+        '--pos3-x': '60%',
+        '--pos3-y': '80%',
+        '--pos4-x': '75%',
+        '--pos4-y': '25%'
+      },
+      right: {
+        '--pos1-x': '65%',
+        '--pos1-y': '20%',
+        '--pos2-x': '85%',
+        '--pos2-y': '70%',
+        '--pos3-x': '25%',
+        '--pos3-y': '80%',
+        '--pos4-x': '10%',
+        '--pos4-y': '25%'
+      }
+    }
+
+    let currentSide = null
+
+    const applyPreset = (side) => {
+      const p = presets[side]
+      if (!p) return
+      Object.keys(p).forEach(key => el.style.setProperty(key, p[key]))
+      el.dataset.side = side
+    }
+
+    // Versión sin suavizado: aplicar preset inmediatamente cuando se detecte el lado
+    const onEnter = (e) => {
+      const rect = el.getBoundingClientRect()
+      const relX = e.clientX - rect.left
+      const side = relX < rect.width / 2 ? 'left' : 'right'
+      if (side !== currentSide) {
+        currentSide = side
+        applyPreset(side)
+      }
+      el.dataset.active = 'true'
+    }
+
+    // Mientras el mouse se mueva dentro del hero, solo comprobaremos si cruza la mitad
+    const onMoveCheckSide = (e) => {
+      const rect = el.getBoundingClientRect()
+      const relX = e.clientX - rect.left
+      const side = relX < rect.width / 2 ? 'left' : 'right'
+      if (side !== currentSide) {
+        currentSide = side
+        applyPreset(side)
+      }
+    }
+
+    const onLeave = () => {
+      el.dataset.active = 'false'
+    }
+
+    el.addEventListener('mouseenter', onEnter)
+    el.addEventListener('mousemove', onMoveCheckSide)
+    el.addEventListener('mouseleave', onLeave)
+
+    // Inicializar con la posición izquierda por defecto, sin activar el glow
+    applyPreset('left')
+    el.dataset.active = 'false'
+
+    return () => {
+      el.removeEventListener('mouseenter', onEnter)
+      el.removeEventListener('mousemove', onMoveCheckSide)
+      el.removeEventListener('mouseleave', onLeave)
+    }
+  }, [])
+
   return (
-    <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Background with gradient overlay */}
+    <section ref={heroRef} className="hero min-h-screen flex items-center justify-center relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-dj-dark via-dj-gray to-dj-dark"></div>
       
-      {/* Animated background elements */}
       <div className="absolute inset-0">
         <motion.div
           animate={{
@@ -123,4 +202,4 @@ const Hero = () => {
   )
 }
 
-export default Hero 
+export default Hero
