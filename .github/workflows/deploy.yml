@@ -39,10 +39,11 @@ jobs:
           mkdir docs
           cp -a dist/. docs/
 
-      - name: Commit and push docs to master
+      - name: Commit and push docs to branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs
           git commit -m "chore(deploy): update docs from workflow [skip ci]" || echo "no changes to commit"
-          git push origin HEAD:master
+          # Push to the branch that triggered the workflow (supports main or master)
+          git push origin HEAD:${GITHUB_REF#refs/heads/}
