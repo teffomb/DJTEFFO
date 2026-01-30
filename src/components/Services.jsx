@@ -7,7 +7,7 @@ const Services = () => {
       icon: 'fas fa-heart',
       title: 'Bodas',
       description: 'Hacemos de tu día especial algo mágico con música romántica y ritmos que harán bailar a todos tus invitados.',
-      features: ['Música romántica', 'Primer baile', 'Playlist personalizada', 'Coordinación con fotógrafo']
+      features: ['Música romántica', 'Primer baile', 'Playlist personalizada', 'Coordinación con maestro de ceremonia']
     },
     {
       icon: 'fas fa-birthday-cake',
@@ -19,7 +19,7 @@ const Services = () => {
       icon: 'fas fa-baby',
       title: 'Eventos Infantiles',
       description: 'Los más pequeños se divierten con música infantil, juegos y animación especial para niños.',
-      features: ['Música infantil', 'Juegos interactivos', 'Animación', 'Efectos de luces']
+      features: ['Música infantil', 'Juegos interactivos', 'Animadora o Payaso', 'Efectos de luces']
     },
     {
       icon: 'fas fa-crown',
