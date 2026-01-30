@@ -9,6 +9,8 @@ import Gallery from './components/Gallery'
 import Pricing from './components/Pricing'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
+import Privacy from './components/Privacy'
+import Terms from './components/Terms'
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -102,6 +104,8 @@ function App() {
             } />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
           </Routes>
         </AnimatePresence>
       </div>
