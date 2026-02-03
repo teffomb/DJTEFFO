@@ -180,25 +180,17 @@ const Hero = () => {
             
             <Link
               to="/contact"
-              className="btn-secondary text-lg px-8 py-4 flex items-center space-x-2"
+              className="btn-secondary text-lg px-6 py-4 flex items-center space-x-2"
+              aria-label="Contáctame"
+              title="Contáctame"
             >
-              {/* Ajuste: envolver el icono en un inline-flex para centrarlo verticalmente */}
+              {/* Icono */}
               <span className="inline-flex items-center justify-center text-xl leading-none" aria-hidden="true">
                 <i className="fas fa-envelope"></i>
               </span>
+              {/* Texto visible */}
               <span>Contáctame</span>
             </Link>
-          </motion.div>
-
-          {/* Scroll indicator */}
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          >
-            <div className="text-dj-gold text-2xl">
-              <i className="fas fa-chevron-down"></i>
-            </div>
           </motion.div>
         </motion.div>
       </div>
