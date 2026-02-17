@@ -1,0 +1,61 @@
+name: Build and deploy Pages (Vite)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  pages: write
+  id-token: write
+  contents: read
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+env:
+  OUTPUT_DIR: ./dist
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site (Vite)
+        run: npm run build
+
+      - name: Ensure output exists and disable Jekyll
+        run: |
+          # Ensure the output directory exists (adjust if your build writes elsewhere)
+          mkdir -p "$OUTPUT_DIR"
+          # Create an empty .nojekyll file so GitHub Pages won't process the site with Jekyll
+          echo "" > "$OUTPUT_DIR/.nojekyll"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ${{ env.OUTPUT_DIR }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        # The deploy action automatically consumes the artifact uploaded by upload-pages-artifact
+        uses: actions/deploy-pages@v1
