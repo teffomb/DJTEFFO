@@ -10,6 +10,7 @@ const About = () => {
   ]
 
   const [bgPos, setBgPos] = useState('75% 40%')
+  const [autoplayAttempted, setAutoplayAttempted] = useState(false)
 
   useEffect(() => {
     const updatePos = () => {
@@ -24,36 +25,84 @@ const About = () => {
     return () => window.removeEventListener('resize', updatePos)
   }, [])
 
-  const handlePlayAudio = () => {
-    const audioEl = document.getElementById('dj-audio') || document.querySelector('audio[src="/Sounds/djteffo.mp3"]')
-    if (!audioEl) return
+  // Use Vite base so paths work both in dev and on GitHub Pages (if base is set)
+  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.BASE_URL) || '/'
 
-    // Determinar si está reproduciéndose ahora
-    const isPlaying = !audioEl.paused && !audioEl.ended && audioEl.currentTime > 0 && audioEl.readyState > 1
-
-    if (isPlaying) {
-      // Si suena, pausarlo y reiniciar a inicio
-      try {
-        audioEl.pause()
-      } catch (e) {}
-      try {
-        audioEl.currentTime = 0
-      } catch (e) {}
-      audioEl.dataset.played = 'true'
+  // Try to autoplay once on mount. If blocked, add a one-time user-interaction listener to start playback.
+  useEffect(() => {
+    if (autoplayAttempted) return
+    const audioEl = document.getElementById('dj-audio') || document.querySelector(`audio[src="${base}Sounds/djteffo.mp3"]`)
+    if (!audioEl) {
+      setAutoplayAttempted(true)
       return
     }
 
-    // Si no está sonando, reproducir desde el inicio
-    try {
-      audioEl.currentTime = 0
-    } catch (e) {}
+    // Helper to try play and return whether it succeeded
+    const tryPlayOnce = async () => {
+      try {
+        audioEl.currentTime = 0
+        const p = audioEl.play()
+        if (p !== undefined) {
+          await p
+        }
+        return true
+      } catch (e) {
+        try {
+          audioEl.muted = true
+          await audioEl.play()
+          audioEl.muted = false
+          return true
+        } catch (e2) {
+          return false
+        }
+      }
+    }
+
+    const runAutoplay = async () => {
+      const ok = await tryPlayOnce()
+      setAutoplayAttempted(true)
+
+      if (!ok) {
+        // If autoplay failed, wait for first user interaction to play once (then remove listener)
+        const userHandler = async () => {
+          try {
+            audioEl.currentTime = 0
+            await audioEl.play()
+          } catch (e) {
+            // ignore
+          }
+          window.removeEventListener('pointerdown', userHandler)
+        }
+        window.addEventListener('pointerdown', userHandler, { once: true })
+      }
+    }
+
+    runAutoplay()
+  }, [autoplayAttempted, base])
+
+  const handlePlayAudio = () => {
+    const audioEl = document.getElementById('dj-audio') || document.querySelector(`audio[src="${base}Sounds/djteffo.mp3"]`)
+    if (!audioEl) return
+
+    const isPlaying = !audioEl.paused && !audioEl.ended && audioEl.currentTime > 0 && audioEl.readyState > 1
+
+    if (isPlaying) {
+      // If playing -> pause and reset to start
+      try { audioEl.pause() } catch (e) {}
+      try { audioEl.currentTime = 0 } catch (e) {}
+      audioEl.dataset.played = 'false'
+      return
+    }
+
+    // If not playing -> play from start
+    try { audioEl.currentTime = 0 } catch (e) {}
     audioEl.muted = false
     const playPromise = audioEl.play()
     if (playPromise !== undefined) {
       playPromise.then(() => {
         audioEl.dataset.played = 'true'
       }).catch(() => {
-        // Autoplay bloqueado: intentar silenciado y luego quitar mute
+        // If blocked, try muted playback then unmute
         try {
           audioEl.muted = true
           audioEl.play().then(() => {
@@ -94,22 +143,19 @@ const About = () => {
             className="space-y-6"
           >
             <div className="relative">
-              {/* Placeholder for DJ image */}
+              {/* Placeholder for DJ image - use <img> with object-fit for better centering */}
               <div className="w-full h-96 bg-gradient-to-br from-dj-gold/20 to-dj-electric-blue/20 rounded-2xl flex items-center justify-center overflow-hidden">
-                {/* Reemplazo: usar background-image para controlar mejor el recorte */}
-                <div
-                  role="img"
-                  aria-label="DJ Teffo"
-                  className="w-full h-full rounded-2xl"
-                  style={{
-                    backgroundImage: `url('/Images/TeffoDJ.jpeg')`,
-                    backgroundPosition: bgPos,
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'no-repeat'
-                  }}
+                <img
+                  src={`${base}Images/TeffoDJ.jpeg`}
+                  alt="DJ Teffo"
+                  className="w-full h-full rounded-2xl object-cover"
+                  style={{ objectPosition: bgPos }}
                 />
               </div>
-              
+
+              {/* Hidden audio element (public folder served at root) */}
+              <audio id="dj-audio" preload="auto" src={`${base}Sounds/djteffo.mp3`} onEnded={(e) => { e.currentTarget.dataset.played = 'false' }} />
+
               {/* Floating elements */}
               <motion.button
                 onClick={handlePlayAudio}
@@ -175,7 +221,7 @@ const About = () => {
               <h4 className="text-xl font-dj font-semibold text-dj-gold mb-6">
                 ¿Por qué elegirme?
               </h4>
-              
+
               {[
                 {
                   icon: 'fas fa-headphones',
