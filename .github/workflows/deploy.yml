@@ -33,15 +33,28 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Copy build to docs
+      - name: Prepare docs for deploy (supports dist or docs outDir)
         run: |
-          rm -rf docs
-          mkdir docs
+          echo "Preparing docs for deploy..."
           if [ -d dist ]; then
+            echo "Found dist/ - copying to docs/"
+            rm -rf docs
+            mkdir -p docs
             cp -a dist/. docs/
+          elif [ -d docs ] && [ "$(ls -A docs)" ]; then
+            echo "Found non-empty docs/ - assuming build output is already in docs/"
+          elif [ -d docs ]; then
+            echo "Found docs/ but it's empty - aborting"
+            ls -la docs || true
+            exit 1
           else
-            echo "dist not found, assuming build output is already in docs/"
+            echo "Neither dist/ nor docs/ found - aborting"
+            exit 1
           fi
+
+          # Ensure .nojekyll exists so GitHub Pages won't try to run Jekyll
+          touch docs/.nojekyll
+          echo "Prepared docs/ (size: $(du -sh docs || true))"
 
       - name: Commit and push docs to branch
         run: |
