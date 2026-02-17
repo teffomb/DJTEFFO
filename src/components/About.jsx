@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 const About = () => {
@@ -8,6 +8,62 @@ const About = () => {
     { number: '100%', label: 'Clientes Satisfechos' },
     { number: '24/7', label: 'Disponibilidad' }
   ]
+
+  const [bgPos, setBgPos] = useState('75% 40%')
+
+  useEffect(() => {
+    const updatePos = () => {
+      const w = window.innerWidth
+      if (w >= 1280) setBgPos('80% 42%') // very large screens
+      else if (w >= 1024) setBgPos('75% 42%') // desktop
+      else if (w >= 768) setBgPos('65% 50%') // tablet
+      else setBgPos('50% 50%') // mobile
+    }
+    updatePos()
+    window.addEventListener('resize', updatePos)
+    return () => window.removeEventListener('resize', updatePos)
+  }, [])
+
+  const handlePlayAudio = () => {
+    const audioEl = document.getElementById('dj-audio') || document.querySelector('audio[src="/Sounds/djteffo.mp3"]')
+    if (!audioEl) return
+
+    // Determinar si está reproduciéndose ahora
+    const isPlaying = !audioEl.paused && !audioEl.ended && audioEl.currentTime > 0 && audioEl.readyState > 1
+
+    if (isPlaying) {
+      // Si suena, pausarlo y reiniciar a inicio
+      try {
+        audioEl.pause()
+      } catch (e) {}
+      try {
+        audioEl.currentTime = 0
+      } catch (e) {}
+      audioEl.dataset.played = 'true'
+      return
+    }
+
+    // Si no está sonando, reproducir desde el inicio
+    try {
+      audioEl.currentTime = 0
+    } catch (e) {}
+    audioEl.muted = false
+    const playPromise = audioEl.play()
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        audioEl.dataset.played = 'true'
+      }).catch(() => {
+        // Autoplay bloqueado: intentar silenciado y luego quitar mute
+        try {
+          audioEl.muted = true
+          audioEl.play().then(() => {
+            audioEl.muted = false
+            audioEl.dataset.played = 'true'
+          }).catch(() => {})
+        } catch (e) {}
+      })
+    }
+  }
 
   return (
     <section id="about" className="section-padding bg-dj-gray">
@@ -39,23 +95,32 @@ const About = () => {
           >
             <div className="relative">
               {/* Placeholder for DJ image */}
-              <div className="w-full h-96 bg-gradient-to-br from-dj-gold/20 to-dj-electric-blue/20 rounded-2xl flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-dj-gold text-6xl mb-4">
-                    <i className="fas fa-user-tie"></i>
-                  </div>
-                  <p className="text-dj-gold font-semibold">Tu Foto Aquí</p>
-                </div>
+              <div className="w-full h-96 bg-gradient-to-br from-dj-gold/20 to-dj-electric-blue/20 rounded-2xl flex items-center justify-center overflow-hidden">
+                {/* Reemplazo: usar background-image para controlar mejor el recorte */}
+                <div
+                  role="img"
+                  aria-label="DJ Teffo"
+                  className="w-full h-full rounded-2xl"
+                  style={{
+                    backgroundImage: `url('/Images/TeffoDJ.jpeg')`,
+                    backgroundPosition: bgPos,
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat'
+                  }}
+                />
               </div>
               
               {/* Floating elements */}
-              <motion.div
+              <motion.button
+                onClick={handlePlayAudio}
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="absolute -top-4 -right-4 w-16 h-16 bg-dj-gold rounded-full flex items-center justify-center"
+                className="absolute -top-3 -right-3 w-12 h-12 bg-dj-gold rounded-full flex items-center justify-center shadow-lg focus:outline-none z-20"
+                aria-label="Reproducir audio"
+                title="Reproducir audio"
               >
-                <i className="fas fa-music text-dj-dark text-xl"></i>
-              </motion.div>
+                <i className="fas fa-music text-dj-dark text-lg"></i>
+              </motion.button>
             </div>
 
             <div className="space-y-4">
@@ -162,4 +227,4 @@ const About = () => {
   )
 }
 
-export default About 
+export default About

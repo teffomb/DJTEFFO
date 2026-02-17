@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from './components/Navbar'
@@ -14,9 +14,63 @@ import Terms from './components/Terms'
 
 function App() {
   const [loading, setLoading] = useState(true)
+  const audioRef = useRef(null)
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000)
+  }, [])
+
+  useEffect(() => {
+    const audioEl = audioRef.current
+    if (!audioEl) return
+
+    // Ajustes básicos
+    try {
+      audioEl.volume = 0.8
+      audioEl.loop = false
+      audioEl.playsInline = true
+    } catch (e) {
+      // algunos navegadores pueden restringir propiedades hasta que el elemento esté listo
+    }
+
+    let didPlay = false
+
+    const playOnce = () => {
+      if (!audioEl || audioEl.dataset.played === 'true' || didPlay) return
+      try {
+        audioEl.currentTime = 0
+      } catch (e) {}
+      audioEl.volume = 0.8
+      const playPromise = audioEl.play()
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          audioEl.dataset.played = 'true'
+          didPlay = true
+        }).catch(() => {
+          // Autoplay bloqueado; no marcar como reproducido aquí
+        })
+      }
+    }
+
+    // Intento inicial cuando el audio esté listo
+    const onCanPlay = () => playOnce()
+    audioEl.addEventListener('canplay', onCanPlay)
+
+    // Fallback: reproducir en la primera interacción del usuario si no se pudo autoplay
+    const onUserInteraction = () => playOnce()
+    window.addEventListener('click', onUserInteraction)
+    window.addEventListener('keydown', onUserInteraction)
+
+    // Si ya está listo, intentar de inmediato
+    if (audioEl.readyState >= 2) {
+      playOnce()
+    }
+
+    return () => {
+      audioEl.removeEventListener('canplay', onCanPlay)
+      window.removeEventListener('click', onUserInteraction)
+      window.removeEventListener('keydown', onUserInteraction)
+    }
   }, [])
 
   if (loading) {
@@ -84,6 +138,9 @@ function App() {
   return (
     <Router basename={import.meta.env.BASE_URL}>
       <div className="App">
+        {/* Reproductor de audio oculto en la app. Se intenta reproducir una sola vez al cargar; también hay fallback por interacción. */}
+        <audio id="dj-audio" ref={audioRef} src="/Sounds/djteffo.mp3" preload="auto" />
+
         <ScrollManager />
         <Navbar />
         <AnimatePresence mode="wait">
