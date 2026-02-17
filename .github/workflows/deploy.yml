@@ -1,10 +1,5 @@
 name: Deploy to GitHub Pages
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
 on:
   push:
     branches:
@@ -13,14 +8,12 @@ on:
 
 jobs:
   build-and-deploy:
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: true # allow pushing with GITHUB_TOKEN
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -33,34 +26,29 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Prepare docs for deploy (supports dist or docs outDir)
+      - name: Prepare artifact (add .nojekyll)
         run: |
-          echo "Preparing docs for deploy..."
+          echo "Ensuring artifact prepared..."
           if [ -d dist ]; then
-            echo "Found dist/ - copying to docs/"
-            rm -rf docs
-            mkdir -p docs
-            cp -a dist/. docs/
-          elif [ -d docs ] && [ "$(ls -A docs)" ]; then
-            echo "Found non-empty docs/ - assuming build output is already in docs/"
-          elif [ -d docs ]; then
-            echo "Found docs/ but it's empty - aborting"
-            ls -la docs || true
-            exit 1
+            touch dist/.nojekyll
+            ls -la dist | sed -n '1,50p'
           else
-            echo "Neither dist/ nor docs/ found - aborting"
+            echo "dist/ not found, aborting"
             exit 1
           fi
 
-          # Ensure .nojekyll exists so GitHub Pages won't try to run Jekyll
-          touch docs/.nojekyll
-          echo "Prepared docs/ (size: $(du -sh docs || true))"
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./dist
 
-      - name: Commit and push docs to branch
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs
-          git commit -m "chore(deploy): update docs from workflow [skip ci]" || echo "no changes to commit"
-          # Push to the branch that triggered the workflow (supports main or master)
-          git push origin HEAD:${GITHUB_REF#refs/heads/}
+  deploy:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: https://$GITHUB_REPOSITORY_OWNER.github.io/${{ github.repository }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
