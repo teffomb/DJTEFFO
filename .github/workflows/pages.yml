@@ -48,7 +48,7 @@ jobs:
           echo "" > "$OUTPUT_DIR/.nojekyll"
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ env.OUTPUT_DIR }}
 
@@ -58,4 +58,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         # The deploy action automatically consumes the artifact uploaded by upload-pages-artifact
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
