@@ -37,7 +37,11 @@ jobs:
         run: |
           rm -rf docs
           mkdir docs
-          cp -a dist/. docs/
+          if [ -d dist ]; then
+            cp -a dist/. docs/
+          else
+            echo "dist not found, assuming build output is already in docs/"
+          fi
 
       - name: Commit and push docs to branch
         run: |
