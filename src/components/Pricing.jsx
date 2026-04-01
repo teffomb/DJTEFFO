@@ -9,7 +9,7 @@ const Pricing = () => {
 
   const packages = [
     {
-      name: '👤 PAQUETE INDIVIDUAL',
+      name: '👤 PAQUETE SOLO DJ',
       description: 'Perfecto si solo necesitas la música y si cuentas con parlante.',
       features: [
         '🎧 DJ profesional con controladora.',
@@ -290,7 +290,7 @@ const Pricing = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.9 }}
-          className="text-center mt-16"
+          className="text-center mt-16 mb-16"
         >
           <div className="bg-gradient-to-r from-dj-gold/10 to-dj-electric-blue/10 rounded-2xl p-8 border border-dj-gold/20">
             <h3 className="text-2xl font-dj font-bold text-dj-gold mb-4">
@@ -314,4 +314,4 @@ const Pricing = () => {
   )
 }
 
-export default Pricing 
+export default Pricing

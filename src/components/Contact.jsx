@@ -62,6 +62,12 @@ const Contact = () => {
       icon: 'fab fa-youtube',
       url: 'https://www.youtube.com/@DjTeffo-in5mt',
       color: 'bg-red-600'
+    },
+    {
+      name: 'SoundCloud',
+      icon: 'fab fa-soundcloud',
+      url: 'https://soundcloud.com/djteffo',
+      color: 'bg-orange-500'
     }
   ]
 
@@ -344,7 +350,7 @@ const Contact = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="mt-16"
+          className="mt-16 mb-16"
         >
           <div className="bg-dj-gray rounded-2xl p-8">
             <h2 className="text-2xl font-dj font-bold text-dj-gold mb-6 text-center">

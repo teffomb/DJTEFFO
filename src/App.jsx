@@ -11,6 +11,7 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 import Privacy from './components/Privacy'
 import Terms from './components/Terms'
+import Testimonials from './components/Testimonials'
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -156,11 +157,28 @@ function App() {
                 <About />
                 <Services />
                 <Gallery />
+                <Testimonials />
                 <Footer />
               </motion.div>
             } />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/contact" element={<Contact />} />
+            <Route
+              path="/pricing"
+              element={(
+                <>
+                  <Pricing />
+                  <Footer />
+                </>
+              )}
+            />
+            <Route
+              path="/contact"
+              element={(
+                <>
+                  <Contact />
+                  <Footer />
+                </>
+              )}
+            />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
           </Routes>
