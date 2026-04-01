@@ -54,7 +54,7 @@ const Contact = () => {
     {
       name: 'Instagram',
       icon: 'fab fa-instagram',
-      url: 'https://www.instagram.com/dj_teffo/',
+      url: 'https://www.instagram.com/idk.teffo/',
       color: 'bg-pink-500'
     },
     {

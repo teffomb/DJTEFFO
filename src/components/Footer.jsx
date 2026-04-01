@@ -28,7 +28,7 @@ const Footer = () => {
 
   const socialLinks = [
     { icon: 'fab fa-whatsapp', url: 'https://wa.me/51922798039?text=Hola%20deseo%20m%C3%A1s%20informaci%C3%B3n%20sobre%20sus%20servicios%20de%20DJ%20%F0%9F%98%81', color: 'hover:bg-green-500' },
-    { icon: 'fab fa-instagram', url: 'https://www.instagram.com/dj_teffo/', color: 'hover:bg-pink-500' },
+    { icon: 'fab fa-instagram', url: 'https://www.instagram.com/idk.teffo/', color: 'hover:bg-pink-500' },
     { icon: 'fab fa-youtube', url: 'https://www.youtube.com/@DjTeffo-in5mt', color: 'hover:bg-red-600' },
     { icon: 'fab fa-soundcloud', url: 'https://soundcloud.com/djteffo', color: 'hover:bg-orange-500' }
   ]
