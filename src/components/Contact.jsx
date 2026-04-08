@@ -1,8 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 import DatePicker from './DatePicker'
 
+const PACKAGE_VALUES = ['solo-dj', 'pack-principal', 'pack-fiesta']
+
 const Contact = () => {
+  const location = useLocation()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,6 +19,19 @@ const Contact = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const packageParam = params.get('package')
+
+    if (PACKAGE_VALUES.includes(packageParam)) {
+      setFormData(prev => (
+        prev.packageType === packageParam
+          ? prev
+          : { ...prev, packageType: packageParam }
+      ))
+    }
+  }, [location.search])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target

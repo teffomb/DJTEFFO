@@ -4,11 +4,11 @@ import { motion } from 'framer-motion'
 
 const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState('hourly')
-  const [centerHovered, setCenterHovered] = useState(false)
   const [hoveredIndex, setHoveredIndex] = useState(null)
 
   const packages = [
     {
+      slug: 'solo-dj',
       name: '👤 PAQUETE SOLO DJ',
       description: 'Perfecto si solo necesitas la música y si cuentas con parlante.',
       features: [
@@ -23,6 +23,7 @@ const Pricing = () => {
       icon: 'fas fa-user'
     },
     {
+      slug: 'pack-principal',
       name: '🎧 PACK PRINCIPAL',
       description: 'Ideal para una fiesta completa y bien equipada.',
       features: [
@@ -38,6 +39,7 @@ const Pricing = () => {
       icon: 'fas fa-headphones'
     },
     {
+      slug: 'pack-fiesta',
       name: '🎊 PACK FIESTA',
       description: 'Para una experiencia más inmersiva con mejor sonido en un ambiente espacioso y efectos.',
       features: [
@@ -181,7 +183,7 @@ const Pricing = () => {
                   </div>
                 )}
                 <Link
-                  to="/contact"
+                  to={`/contact?package=${pkg.slug}`}
                   className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-neon hover:scale-105 active:scale-95 ${pkg.popular ? 'bg-gradient-to-r from-dj-gold to-fuchsia-400 text-dj-dark hover:from-yellow-300 hover:to-pink-400' : 'bg-transparent border-2 border-dj-gold text-dj-gold hover:bg-dj-gold hover:text-dj-dark'}`}
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
