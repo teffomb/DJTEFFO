@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
+import DatePicker from './DatePicker'
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -7,6 +8,7 @@ const Contact = () => {
     email: '',
     phone: '',
     eventType: '',
+    packageType: '',
     date: '',
     message: ''
   })
@@ -35,6 +37,7 @@ const Contact = () => {
         email: '',
         phone: '',
         eventType: '',
+        packageType: '',
         date: '',
         message: ''
       })
@@ -208,17 +211,35 @@ const Contact = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Fecha del Evento
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white focus:outline-none focus:border-dj-gold transition-colors"
-                />
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Paquete *
+                  </label>
+                  <select
+                    name="packageType"
+                    value={formData.packageType}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white focus:outline-none focus:border-dj-gold transition-colors"
+                  >
+                    <option value="">Selecciona un paquete</option>
+                    <option value="solo-dj">Paquete Solo DJ - S/. 250</option>
+                    <option value="pack-principal">Pack Principal - S/. 399</option>
+                    <option value="pack-fiesta">Pack Fiesta - S/. 499</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Fecha del Evento
+                  </label>
+                  <DatePicker
+                    name="date"
+                    value={formData.date}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
 
               <div>
