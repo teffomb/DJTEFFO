@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const AUTOPLAY_MS = 3000
@@ -27,24 +27,51 @@ const slideVariants = {
   }),
 }
 
+const extractYouTubeId = (url) => {
+  if (!url) return ''
+
+  const match = url.match(
+    /(?:youtube\.com\/(?:shorts\/|watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/
+  )
+
+  return match ? match[1] : ''
+}
+
+const toEmbedUrl = (url) => {
+  const id = extractYouTubeId(url)
+  return id ? `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1` : ''
+}
+
+const toPreviewEmbedUrl = (url) => {
+  const id = extractYouTubeId(url)
+  return id
+    ? `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=1&fs=1&loop=1&playlist=${id}&playsinline=1&rel=0&modestbranding=1`
+    : ''
+}
+
+const toThumbnailUrl = (url) => {
+  const id = extractYouTubeId(url)
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : ''
+}
+
 const Gallery = () => {
   const videosPorCategoria = {
     Cumpleaños: [
-      { id: 'v1', src: '/videos/fiesta.mp4', alt: 'Fiesta' },
-      { id: 'v2', src: '/videos/fiesta1.mp4', alt: 'Fiesta 1' },
+      { id: 'v1', youtubeUrl: 'https://youtube.com/shorts/0nq2vyIoDqM', alt: 'Fiesta' },
+      { id: 'v2', youtubeUrl: 'https://youtube.com/shorts/1fdOgiXVIO0', alt: 'Fiesta 1' },
     ],
     Infantil: [
-      { id: 'v3', src: '/videos/infantil.mp4', alt: 'Evento Infantil' },
+      { id: 'v3', youtubeUrl: 'https://youtube.com/shorts/cAb1_qhATSI', alt: 'Evento Infantil' },
     ],
     Privado: [
-      { id: 'v4', src: '/videos/payaso.mp4', alt: 'Show de Payaso' },
-      { id: 'v5', src: '/videos/payasa.mp4', alt: 'Show de Payasa' },
-      { id: 'v6', src: '/videos/piscina.mp4', alt: 'Fiesta en Piscina' },
-      { id: 'v7', src: '/videos/piscina2.mp4', alt: 'Fiesta en Piscina 2' },
-      { id: 'v8', src: '/videos/piscina3.mp4', alt: 'Fiesta en Piscina 3' },
+      { id: 'v4', youtubeUrl: 'https://youtube.com/shorts/cN_o7Qlz7mY', alt: 'Show de Payaso' },
+      { id: 'v5', youtubeUrl: 'https://youtube.com/shorts/Hry4_FGmao4', alt: 'Show de Payasa' },
+      { id: 'v6', youtubeUrl: 'https://youtube.com/shorts/gWAykSiIKag', alt: 'Fiesta en Piscina' },
+      { id: 'v7', youtubeUrl: 'https://youtube.com/shorts/JHBBKy5Og54', alt: 'Fiesta en Piscina 2' },
+      { id: 'v8', youtubeUrl: 'https://youtube.com/shorts/H5oebJbpoDA', alt: 'Fiesta en Piscina 3' },
     ],
     XV: [
-      { id: 'v9', src: '/videos/hora_loca.mp4', alt: 'Hora Loca' },
+      { id: 'v9', youtubeUrl: 'https://youtube.com/shorts/Zw3dpGuH7fg', alt: 'Hora Loca' },
     ],
   }
 
@@ -52,34 +79,30 @@ const Gallery = () => {
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [activeIndex, setActiveIndex] = useState(0)
   const [slideDirection, setSlideDirection] = useState(1)
-  const [previewId, setPreviewId] = useState(null)
-  const [playingId, setPlayingId] = useState(null)
   const [isCarouselPaused, setIsCarouselPaused] = useState(false)
-
-  const videoRefs = useRef({})
+  const [previewId, setPreviewId] = useState(null)
 
   const filteredVideos = useMemo(() => {
-    return selectedCategory === 'Todos'
-      ? Object.values(videosPorCategoria).flat()
-      : videosPorCategoria[selectedCategory] || []
+    const items =
+      selectedCategory === 'Todos'
+        ? Object.values(videosPorCategoria).flat()
+        : videosPorCategoria[selectedCategory] || []
+
+    return items
+      .map((video) => ({
+        ...video,
+        embedUrl: toEmbedUrl(video.youtubeUrl),
+        previewEmbedUrl: toPreviewEmbedUrl(video.youtubeUrl),
+        thumbnailUrl: toThumbnailUrl(video.youtubeUrl),
+      }))
+      .filter((video) => video.embedUrl)
   }, [selectedCategory])
 
   useEffect(() => {
     setActiveIndex(0)
     setSlideDirection(1)
-    setPreviewId(null)
-    setPlayingId(null)
     setIsCarouselPaused(false)
-
-    // Asegura que ningún video quede reproduciéndose al cambiar de categoría.
-    Object.values(videoRefs.current).forEach((videoEl) => {
-      if (!videoEl) return
-      videoEl.pause()
-      videoEl.currentTime = 0
-      videoEl.controls = false
-      videoEl.muted = true
-      videoEl.loop = false
-    })
+    setPreviewId(null)
   }, [selectedCategory])
 
   const currentVideo = filteredVideos[activeIndex]
@@ -94,30 +117,18 @@ const Gallery = () => {
   const prevVideo = prevIndex !== null ? filteredVideos[prevIndex] : null
   const nextVideo = nextIndex !== null ? filteredVideos[nextIndex] : null
 
-  const stopAllVideos = () => {
-    Object.values(videoRefs.current).forEach((videoEl) => {
-      if (!videoEl) return
-      videoEl.pause()
-      videoEl.currentTime = 0
-      videoEl.controls = false
-      videoEl.muted = true
-      videoEl.loop = false
-    })
-  }
-
   useEffect(() => {
-    const canAutoplay = filteredVideos.length > 1 && !isCarouselPaused && !playingId
+    const canAutoplay = filteredVideos.length > 1 && !isCarouselPaused
     if (!canAutoplay) return undefined
 
     const timer = setInterval(() => {
       setSlideDirection(1)
       setActiveIndex((prev) => (prev === filteredVideos.length - 1 ? 0 : prev + 1))
       setPreviewId(null)
-      stopAllVideos()
     }, AUTOPLAY_MS)
 
     return () => clearInterval(timer)
-  }, [filteredVideos.length, isCarouselPaused, playingId])
+  }, [filteredVideos.length, isCarouselPaused])
 
   const goToSlide = (index) => {
     if (!filteredVideos.length) return
@@ -129,95 +140,6 @@ const Gallery = () => {
     setIsCarouselPaused(true)
     setActiveIndex(normalizedIndex)
     setPreviewId(null)
-    setPlayingId(null)
-    stopAllVideos()
-  }
-
-  const startPreview = (videoId) => {
-    if (!videoId || playingId === videoId) return
-    setIsCarouselPaused(true)
-    stopAllVideos()
-    const videoEl = videoRefs.current[videoId]
-    if (!videoEl) return
-
-    videoEl.muted = true
-    videoEl.controls = false
-    videoEl.loop = true
-    videoEl.currentTime = 0
-    setPreviewId(videoId)
-    setPlayingId(null)
-
-    videoEl.play().catch(() => {
-      // Si el navegador bloquea la reproducción automática, dejamos el frame inicial.
-    })
-  }
-
-  const stopPreview = (videoId) => {
-    if (!videoId || previewId !== videoId) return
-    const videoEl = videoRefs.current[videoId]
-    if (!videoEl) return
-
-    videoEl.pause()
-    videoEl.currentTime = 0
-    videoEl.loop = false
-    setPreviewId(null)
-    setIsCarouselPaused(false)
-  }
-
-  const playWithSound = (videoId) => {
-    if (!videoId) return
-    setIsCarouselPaused(true)
-
-    const videoEl = videoRefs.current[videoId]
-    if (!videoEl) return
-
-    // Si ya es el video activo, hacemos toggle play/pause sin reiniciar.
-    if (playingId === videoId) {
-      if (videoEl.paused) {
-        const resumePromise = videoEl.play()
-        if (resumePromise !== undefined) {
-          resumePromise
-            .then(() => {
-              setPlayingId(videoId)
-              videoEl.controls = true
-            })
-            .catch(() => {
-              setPlayingId(videoId)
-              videoEl.controls = true
-            })
-        }
-      } else {
-        videoEl.pause()
-        setPlayingId(videoId)
-        videoEl.controls = true
-      }
-      return
-    }
-
-    stopAllVideos()
-
-    setPreviewId(null)
-    setPlayingId(null)
-    videoEl.currentTime = 0
-    videoEl.muted = false
-    videoEl.controls = false
-    videoEl.loop = false
-
-    const playPromise = videoEl.play()
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          setPlayingId(videoId)
-          videoEl.controls = true
-        })
-        .catch(() => {
-          setPlayingId(videoId)
-          videoEl.controls = true
-        })
-    } else {
-      setPlayingId(videoId)
-      videoEl.controls = true
-    }
   }
 
   const prevSlide = () => {
@@ -226,8 +148,6 @@ const Gallery = () => {
     setIsCarouselPaused(true)
     setActiveIndex((prev) => (prev === 0 ? filteredVideos.length - 1 : prev - 1))
     setPreviewId(null)
-    setPlayingId(null)
-    stopAllVideos()
   }
 
   const nextSlide = () => {
@@ -236,8 +156,6 @@ const Gallery = () => {
     setIsCarouselPaused(true)
     setActiveIndex((prev) => (prev === filteredVideos.length - 1 ? 0 : prev + 1))
     setPreviewId(null)
-    setPlayingId(null)
-    stopAllVideos()
   }
 
   return (
@@ -255,7 +173,7 @@ const Gallery = () => {
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Momentos especiales capturados en eventos inolvidables.
-            Ahora puedes previsualizar cada video y abrirlo con sonido al hacer click.
+            Ahora los videos se reproducen directamente desde YouTube para mayor compatibilidad.
           </p>
         </motion.div>
 
@@ -291,12 +209,11 @@ const Gallery = () => {
                   className="hidden md:block relative w-28 lg:w-36 aspect-[9/16] rounded-2xl overflow-hidden border border-white/15 bg-black/80 opacity-65 blur-[1.5px] hover:opacity-90 hover:scale-[1.02] transition duration-300 shadow-[0_20px_45px_rgba(0,0,0,0.45)]"
                   aria-label={`Ver video anterior: ${prevVideo.alt}`}
                 >
-                  <video
-                    src={prevVideo.src}
+                  <img
+                    src={prevVideo.thumbnailUrl}
+                    alt={prevVideo.alt}
                     className="w-full h-full object-cover scale-105"
-                    muted
-                    playsInline
-                    preload="metadata"
+                    loading="lazy"
                   />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/55 via-black/25 to-transparent" />
                 </button>
@@ -318,33 +235,27 @@ const Gallery = () => {
                         exit="exit"
                         transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
                         className="absolute inset-0"
+                        onMouseEnter={() => {
+                          setIsCarouselPaused(true)
+                          setPreviewId(currentVideo.id)
+                        }}
+                        onMouseLeave={() => {
+                          setPreviewId(null)
+                          setIsCarouselPaused(false)
+                        }}
                       >
-                        <video
-                          ref={(el) => {
-                            videoRefs.current[currentVideo.id] = el
-                          }}
-                          src={currentVideo.src}
-                          className="w-full h-full object-cover"
-                          preload="auto"
-                          controls={playingId === currentVideo.id}
-                          muted={playingId !== currentVideo.id}
-                          playsInline
-                          onMouseEnter={() => startPreview(currentVideo.id)}
-                          onMouseLeave={() => stopPreview(currentVideo.id)}
-                          onFocus={() => startPreview(currentVideo.id)}
-                          onBlur={() => stopPreview(currentVideo.id)}
-                          onClick={(event) => {
-                            event.preventDefault()
-                            event.stopPropagation()
-                            playWithSound(currentVideo.id)
-                          }}
+                        <iframe
+                          src={previewId === currentVideo.id ? currentVideo.previewEmbedUrl : currentVideo.embedUrl}
+                          title={currentVideo.alt}
+                          className="w-full h-full"
+                          loading="lazy"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          allowFullScreen
                         />
 
                         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20" />
 
-                        <div className="absolute top-4 left-4 bg-black/65 text-white text-xs md:text-sm px-3 py-1 rounded-full">
-                          {previewId === currentVideo.id ? 'Vista previa (sin sonido)' : 'Haz click para reproducir con sonido'}
-                        </div>
                         <div className="absolute bottom-4 right-4 bg-dj-gold text-dj-dark text-xs md:text-sm font-semibold px-3 py-1 rounded-full">
                           {activeIndex + 1}/{filteredVideos.length}
                         </div>
@@ -371,7 +282,7 @@ const Gallery = () => {
 
                   {filteredVideos.length > 1 && (
                     <div className="absolute left-0 right-0 bottom-0 h-1.5 bg-white/5 overflow-hidden">
-                      {!isCarouselPaused && !playingId ? (
+                      {!isCarouselPaused ? (
                         <motion.div
                           key={`${currentVideo.id}-progress`}
                           initial={{ width: '0%' }}
@@ -397,12 +308,11 @@ const Gallery = () => {
                   className="hidden md:block relative w-28 lg:w-36 aspect-[9/16] rounded-2xl overflow-hidden border border-white/15 bg-black/80 opacity-65 blur-[1.5px] hover:opacity-90 hover:scale-[1.02] transition duration-300 shadow-[0_20px_45px_rgba(0,0,0,0.45)]"
                   aria-label={`Ver siguiente video: ${nextVideo.alt}`}
                 >
-                  <video
-                    src={nextVideo.src}
+                  <img
+                    src={nextVideo.thumbnailUrl}
+                    alt={nextVideo.alt}
                     className="w-full h-full object-cover scale-105"
-                    muted
-                    playsInline
-                    preload="metadata"
+                    loading="lazy"
                   />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-black/55 via-black/25 to-transparent" />
                 </button>
