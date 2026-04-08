@@ -4,12 +4,28 @@ import { useLocation } from 'react-router-dom'
 import DatePicker from './DatePicker'
 
 const PACKAGE_VALUES = ['solo-dj', 'pack-principal', 'pack-fiesta']
+const PACKAGE_LABELS = {
+  'solo-dj': 'Paquete Solo DJ - S/. 250',
+  'pack-principal': 'Pack Principal - S/. 399',
+  'pack-fiesta': 'Pack Fiesta - S/. 499'
+}
+
+const EVENT_TYPE_LABELS = {
+  boda: 'Boda',
+  cumpleanos: 'Cumpleaños',
+  corporativo: 'Evento Corporativo',
+  infantil: 'Evento Infantil',
+  privado: 'Fiesta Privada',
+  otro: 'Otro'
+}
+
+const RECIPIENT_EMAIL = 'djdang45@gmail.com'
+const FORM_SUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${RECIPIENT_EMAIL}`
 
 const Contact = () => {
   const location = useLocation()
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     phone: '',
     eventType: '',
     packageType: '',
@@ -19,6 +35,7 @@ const Contact = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -44,24 +61,52 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
-    
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false)
-      setSubmitSuccess(true)
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        eventType: '',
-        packageType: '',
-        date: '',
-        message: ''
+    setSubmitError('')
+
+    const payload = {
+      name: formData.name.trim(),
+      phone: formData.phone.trim(),
+      eventType: EVENT_TYPE_LABELS[formData.eventType] || formData.eventType,
+      packageType: PACKAGE_LABELS[formData.packageType] || formData.packageType,
+      date: formData.date || 'No especificada',
+      message: formData.message.trim(),
+      _subject: `Nuevo mensaje desde DJ TEFFO - ${formData.name.trim()}`,
+      _captcha: 'false',
+      _template: 'table'
+    }
+
+    try {
+      const response = await fetch(FORM_SUBMIT_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify(payload)
       })
-      
-      // Reset success message after 3 seconds
-      setTimeout(() => setSubmitSuccess(false), 3000)
-    }, 2000)
+
+      if (response.ok) {
+        setSubmitSuccess(true)
+        setFormData({
+          name: '',
+          phone: '',
+          eventType: '',
+          packageType: '',
+          date: '',
+          message: ''
+        })
+
+        // Reset success message after 3 seconds
+        setTimeout(() => setSubmitSuccess(false), 3000)
+      } else {
+        setSubmitError('No se pudo enviar automáticamente. Inténtalo de nuevo en unos segundos.')
+      }
+    } catch (error) {
+      console.error(error)
+      setSubmitError('No se pudo enviar automáticamente. Inténtalo de nuevo en unos segundos.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const socialLinks = [
@@ -160,6 +205,17 @@ const Contact = () => {
               </motion.div>
             )}
 
+            {submitError && !submitSuccess && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-yellow-500/20 border border-yellow-500 text-yellow-300 p-4 rounded-lg mb-6 flex items-center"
+              >
+                <i className="fas fa-exclamation-triangle mr-3 text-xl"></i>
+                <span>{submitError}</span>
+              </motion.div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
@@ -178,23 +234,6 @@ const Contact = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-dj-gold transition-colors"
-                    placeholder="tu@email.com"
-                  />
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Teléfono
                   </label>
                   <input
@@ -202,10 +241,14 @@ const Contact = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
+                    required
                     className="w-full px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-dj-gold transition-colors"
                     placeholder="+51 999 999 999"
                   />
                 </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Tipo de Evento *
@@ -219,7 +262,7 @@ const Contact = () => {
                   >
                     <option value="">Selecciona un tipo</option>
                     <option value="boda">Boda</option>
-                    <option value="cumpleaños">Cumpleaños</option>
+                    <option value="cumpleanos">Cumpleaños</option>
                     <option value="corporativo">Evento Corporativo</option>
                     <option value="infantil">Evento Infantil</option>
                     <option value="privado">Fiesta Privada</option>
@@ -247,7 +290,7 @@ const Contact = () => {
                   </select>
                 </div>
 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Fecha del Evento
                   </label>
