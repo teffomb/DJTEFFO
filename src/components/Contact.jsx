@@ -36,6 +36,12 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  // Google Maps: read API key from Vite env var VITE_GOOGLE_MAPS_API_KEY
+  // If not provided, we fall back to a simple embed URL that centers on "Comas, Lima, Peru".
+  const MAP_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
+  const mapSrc = MAP_KEY
+    ? `https://www.google.com/maps/embed/v1/place?key=${MAP_KEY}&q=Comas,Lima,Peru&zoom=12`
+    : 'https://www.google.com/maps?q=Comas+Lima+Peru&output=embed'
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -433,22 +439,29 @@ const Contact = () => {
           transition={{ duration: 0.8, delay: 0.5 }}
           className="mt-16 mb-16"
         >
-          <div className="bg-dj-gray rounded-2xl p-8">
-            <h2 className="text-2xl font-dj font-bold text-dj-gold mb-6 text-center">
-              Zona de Cobertura
-            </h2>
-            <div className="h-64 bg-dj-light-gray rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <i className="fas fa-map-marked-alt text-dj-gold text-4xl mb-4"></i>
-                <p className="text-gray-300 mb-2">
-                  Cubrimos toda Lima Metropolitana
-                </p>
-                <p className="text-dj-gold font-semibold mt-2">
-                  Consulta disponibilidad para tu ubicación
-                </p>
+              <div className="bg-dj-gray rounded-2xl p-8">
+                <h2 className="text-2xl font-dj font-bold text-dj-gold mb-6 text-center">
+                  Zona de Cobertura
+                </h2>
+                <div className="rounded-lg overflow-hidden border border-gray-700">
+                  {/* Responsive iframe map centered on Comas, Lima, Peru. */}
+                  <div className="w-full h-64 sm:h-80 md:h-96">
+                    <iframe
+                      title="Mapa - Zona de Cobertura (Comas, Lima)"
+                      src={mapSrc}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  </div>
+                      <div className="p-4 bg-dj-light-gray text-center">
+                        <p className="text-gray-300 mb-1">Zoom y navegación disponibles sobre el mapa.</p>
+                      </div>
+                </div>
               </div>
-            </div>
-          </div>
         </motion.div>
       </div>
     </div>
