@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 // Each carousel slide can use this player without downloading its video upfront.
-const GalleryVideo = ({ src, poster, title }) => {
+const GalleryVideo = ({ src, poster, title, onPlaybackChange }) => {
   const videoRef = useRef(null)
   const [started, setStarted] = useState(false)
   const [failed, setFailed] = useState(false)
@@ -41,7 +41,13 @@ const GalleryVideo = ({ src, poster, title }) => {
           playsInline
           autoPlay
           preload="none"
-          onError={() => setFailed(true)}
+          onPlay={() => onPlaybackChange?.(true)}
+          onPause={() => onPlaybackChange?.(false)}
+          onEnded={() => onPlaybackChange?.(false)}
+          onError={() => {
+            setFailed(true)
+            onPlaybackChange?.(false)
+          }}
         >
           Tu navegador no puede reproducir este video.
         </video>
@@ -50,7 +56,10 @@ const GalleryVideo = ({ src, poster, title }) => {
           type="button"
           className="relative block w-full h-full group focus-visible:outline focus-visible:outline-2 focus-visible:outline-dj-gold focus-visible:-outline-offset-4"
           aria-label={`Reproducir: ${title}`}
-          onClick={() => setStarted(true)}
+          onClick={() => {
+            onPlaybackChange?.(true)
+            setStarted(true)
+          }}
         >
           <img
             src={poster}
