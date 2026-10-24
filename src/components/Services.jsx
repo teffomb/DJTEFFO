@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
+import ServicePreview from './ServicePreview'
 
 const Services = () => {
+  const [selectedIndex, setSelectedIndex] = useState(null)
   const services = [
     {
       icon: 'fas fa-heart',
@@ -68,7 +70,7 @@ const Services = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="bg-dj-gray rounded-2xl p-6 card-hover border border-dj-light-gray"
+              className="relative bg-dj-gray rounded-2xl p-6 card-hover border border-dj-light-gray"
             >
               <div className="text-center mb-6">
                 <div className="w-16 h-16 bg-gradient-to-br from-dj-gold to-dj-electric-blue rounded-full flex items-center justify-center mx-auto mb-4">
@@ -101,11 +103,17 @@ const Services = () => {
                 ))}
               </div>
 
-              {/* Hover effect overlay */}
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="absolute inset-0 bg-gradient-to-br from-dj-gold/5 to-dj-electric-blue/5 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-300"
-              />
+              <button
+                type="button"
+                aria-label={`Ampliar información de ${service.title}`}
+                aria-haspopup="dialog"
+                onClick={() => setSelectedIndex(index)}
+                className="absolute inset-0 w-full h-full cursor-pointer bg-gradient-to-br from-dj-gold/5 to-dj-electric-blue/5 rounded-2xl opacity-0 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-dj-gold transition-opacity duration-300"
+              >
+                <span className="absolute top-3 right-3 text-dj-gold" aria-hidden="true">
+                  <i className="fas fa-expand-alt" />
+                </span>
+              </button>
             </motion.div>
           ))}
         </div>
@@ -137,8 +145,16 @@ const Services = () => {
           </div>
         </motion.div>
       </div>
+      {selectedIndex !== null && (
+        <ServicePreview
+          services={services}
+          activeIndex={selectedIndex}
+          onNavigate={direction => setSelectedIndex(index => (index + direction + services.length) % services.length)}
+          onClose={() => setSelectedIndex(null)}
+        />
+      )}
     </section>
   )
 }
 
-export default Services 
+export default Services

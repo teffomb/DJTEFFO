@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 
 const About = () => {
@@ -10,7 +10,10 @@ const About = () => {
   ]
 
   const [bgPos, setBgPos] = useState('75% 40%')
-  const [autoplayAttempted, setAutoplayAttempted] = useState(false)
+  const audioRef = useRef(null)
+  const audioButtonRef = useRef(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [audioError, setAudioError] = useState(false)
 
   useEffect(() => {
     const updatePos = () => {
@@ -26,92 +29,62 @@ const About = () => {
   }, [])
 
   // Use Vite base so paths work both in dev and on GitHub Pages (if base is set)
-  const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.BASE_URL) || '/'
+  const base = import.meta.env.BASE_URL
 
   // Try to autoplay once on mount. If blocked, add a one-time user-interaction listener to start playback.
   useEffect(() => {
-    if (autoplayAttempted) return
-    const audioEl = document.getElementById('dj-audio') || document.querySelector(`audio[src="${base}Sounds/djteffo.mp3"]`)
-    if (!audioEl) {
-      setAutoplayAttempted(true)
-      return
-    }
+    const audioEl = audioRef.current
+    let disposed = false
+    audioEl.volume = 0.8
 
-    // Helper to try play and return whether it succeeded
-    const tryPlayOnce = async () => {
-      try {
-        audioEl.currentTime = 0
-        const p = audioEl.play()
-        if (p !== undefined) {
-          await p
-        }
-        return true
-      } catch (e) {
-        try {
-          audioEl.muted = true
-          await audioEl.play()
-          audioEl.muted = false
-          return true
-        } catch (e2) {
-          return false
-        }
-      }
-    }
-
-    const runAutoplay = async () => {
-      const ok = await tryPlayOnce()
-      setAutoplayAttempted(true)
-
-      if (!ok) {
-        // If autoplay failed, wait for first user interaction to play once (then remove listener)
-        const userHandler = async () => {
-          try {
-            audioEl.currentTime = 0
-            await audioEl.play()
-          } catch (e) {
-            // ignore
-          }
-          window.removeEventListener('pointerdown', userHandler)
-        }
-        window.addEventListener('pointerdown', userHandler, { once: true })
-      }
-    }
-
-    runAutoplay()
-  }, [autoplayAttempted, base])
-
-  const handlePlayAudio = () => {
-    const audioEl = document.getElementById('dj-audio') || document.querySelector(`audio[src="${base}Sounds/djteffo.mp3"]`)
-    if (!audioEl) return
-
-    const isPlaying = !audioEl.paused && !audioEl.ended && audioEl.currentTime > 0 && audioEl.readyState > 1
-
-    if (isPlaying) {
-      // If playing -> pause and reset to start
-      try { audioEl.pause() } catch (e) {}
-      try { audioEl.currentTime = 0 } catch (e) {}
-      audioEl.dataset.played = 'false'
-      return
-    }
-
-    // If not playing -> play from start
-    try { audioEl.currentTime = 0 } catch (e) {}
-    audioEl.muted = false
-    const playPromise = audioEl.play()
-    if (playPromise !== undefined) {
-      playPromise.then(() => {
+    const tryPlayOnce = () => {
+      if (audioEl.dataset.played === 'true' || !audioEl.paused) return
+      audioEl.play().then(() => {
+        if (disposed) return
         audioEl.dataset.played = 'true'
+        window.removeEventListener('pointerdown', handleInteraction)
       }).catch(() => {
-        // If blocked, try muted playback then unmute
-        try {
-          audioEl.muted = true
-          audioEl.play().then(() => {
-            audioEl.muted = false
-            audioEl.dataset.played = 'true'
-          }).catch(() => {})
-        } catch (e) {}
+        // Browsers may require a user gesture before playing audible media.
       })
     }
+
+    const handleInteraction = event => {
+      // Let the music button handle its own click, without toggling playback twice.
+      if (audioButtonRef.current?.contains(event.target)) {
+        window.removeEventListener('pointerdown', handleInteraction)
+        return
+      }
+      tryPlayOnce()
+    }
+
+    window.addEventListener('pointerdown', handleInteraction)
+    tryPlayOnce()
+
+    return () => {
+      disposed = true
+      window.removeEventListener('pointerdown', handleInteraction)
+      audioEl.pause()
+    }
+  }, [])
+
+  const handlePlayAudio = () => {
+    const audioEl = audioRef.current
+    if (!audioEl) return
+
+    if (!audioEl.paused && !audioEl.ended) {
+      audioEl.pause()
+      audioEl.currentTime = 0
+      return
+    }
+
+    audioEl.currentTime = 0
+    audioEl.muted = false
+    setAudioError(false)
+    audioEl.play().then(() => {
+      audioEl.dataset.played = 'true'
+    }).catch(error => {
+      if (error.name !== 'AbortError') setAudioError(true)
+    })
   }
 
   return (
@@ -153,21 +126,38 @@ const About = () => {
                 />
               </div>
 
-              {/* Hidden audio element (public folder served at root) */}
-              <audio id="dj-audio" preload="auto" src={`${base}Sounds/djteffo.mp3`} onEnded={(e) => { e.currentTarget.dataset.played = 'false' }} />
+              <audio
+                id="dj-audio"
+                ref={audioRef}
+                preload="auto"
+                src={`${base}Sounds/djteffo.mp3`}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onEnded={() => setIsPlaying(false)}
+                onError={() => setAudioError(true)}
+              />
 
               {/* Floating elements */}
               <motion.button
+                ref={audioButtonRef}
+                type="button"
                 onClick={handlePlayAudio}
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className="absolute -top-3 -right-3 w-12 h-12 bg-dj-gold rounded-full flex items-center justify-center shadow-lg focus:outline-none z-20"
-                aria-label="Reproducir audio"
-                title="Reproducir audio"
+                aria-label={isPlaying ? 'Detener audio' : 'Reproducir audio'}
+                aria-pressed={isPlaying}
+                title={isPlaying ? 'Detener audio' : 'Reproducir audio'}
               >
                 <i className="fas fa-music text-dj-dark text-lg"></i>
               </motion.button>
             </div>
+
+            {audioError && (
+              <p role="alert" className="text-sm text-gray-300">
+                No se pudo reproducir el audio. Vuelve a intentarlo.
+              </p>
+            )}
 
             <div className="space-y-4">
               <h3 className="text-2xl font-dj font-bold text-dj-gold">
