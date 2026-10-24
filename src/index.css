@@ -6,6 +6,13 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Scale rem-based typography, spacing and components together on desktop. */
+  @media (min-width: 1024px) {
+    html {
+      font-size: 80%;
+    }
+  }
   
   body {
     @apply bg-dj-dark text-white font-body;

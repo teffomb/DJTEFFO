@@ -110,7 +110,7 @@ const Gallery = () => {
             <img src={previousVideo.poster} alt="" width="360" height="640" loading="lazy" decoding="async" className="w-full h-full object-cover" />
           </button>
 
-          <div className="relative w-full max-w-[360px] min-w-0">
+          <div className="relative w-full max-w-[22.5rem] md:max-w-[min(22.5rem,32svh)] min-w-0">
             <div className="absolute -inset-3 bg-dj-gold/15 blur-2xl rounded-[2rem] pointer-events-none" />
             <div className="relative rounded-2xl overflow-hidden bg-black border border-white/15 shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
               {/* Immediately unmount the old player to stop and release its video. */}
@@ -141,7 +141,7 @@ const Gallery = () => {
           </button>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-1 max-w-md mx-auto mt-3" role="group" aria-label="Elegir video">
+        <div className="flex flex-wrap justify-center gap-1 max-w-2xl mx-auto mt-3" role="group" aria-label="Elegir video">
           {videos.map((video, index) => (
             <button
               key={video.id}

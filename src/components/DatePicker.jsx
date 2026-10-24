@@ -164,7 +164,7 @@ const DatePicker = ({ name, value, onChange }) => {
               ))}
             </div>
 
-            <div className="relative min-h-[252px] overflow-hidden">
+            <div className="relative min-h-[15.75rem] overflow-hidden">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={`${visibleMonth.getFullYear()}-${visibleMonth.getMonth()}`}
