@@ -1,14 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { visibleStats as stats } from '../data/stats'
 
 const About = () => {
-  const stats = [
-    { number: '100+', label: 'Eventos Realizados' },
-    { number: '5+', label: 'Años de Experiencia' },
-    { number: '100%', label: 'Clientes Satisfechos' },
-    { number: '24/7', label: 'Disponibilidad' }
-  ]
-
   const [bgPos, setBgPos] = useState('75% 40%')
   const audioRef = useRef(null)
   const audioButtonRef = useRef(null)
@@ -186,7 +180,7 @@ const About = () => {
             className="space-y-8"
           >
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-6">
+            {stats.length > 0 && <div className="grid grid-cols-2 gap-6">
               {stats.map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -197,14 +191,14 @@ const About = () => {
                   className="text-center p-6 bg-dj-light-gray rounded-xl card-hover"
                 >
                   <div className="text-3xl md:text-4xl font-dj font-bold text-dj-gold mb-2">
-                    {stat.number}
+                    {stat.value}
                   </div>
                   <div className="text-sm text-gray-300">
                     {stat.label}
                   </div>
                 </motion.div>
               ))}
-            </div>
+            </div>}
 
             {/* Features */}
             <div className="space-y-4">
