@@ -1,6 +1,19 @@
 import React, { useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { genres } from '../data/genres'
+import { mixes } from '../data/mixes'
+import { getMixEmbed } from './Mixes'
+
+const scrollTo = (e, id) => {
+  const el = document.getElementById(id)
+  if (!el) return // sin sección (p. ej. Mixes vacío): el href hace el resto
+  e.preventDefault()
+  const nav = document.querySelector('nav')
+  const top = el.getBoundingClientRect().top + window.pageYOffset - (nav ? nav.offsetHeight : 80) - 10
+  window.scrollTo({ top, behavior: 'smooth' })
+}
+
+const hasMixes = mixes.some(m => getMixEmbed(m.url))
 
 const Hero = () => {
   const heroRef = useRef(null)
@@ -158,7 +171,7 @@ const Hero = () => {
             Transformando momentos ordinarios en experiencias extraordinarias
             <br />
             <span className="text-dj-gold font-semibold">
-              Música • Entretenimiento • Diversión
+              {genres.slice(0, 5).map(g => g.name).join(' • ')}
             </span>
           </motion.p>
 
@@ -169,28 +182,25 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Link
-              to="/pricing"
-              className="btn-primary text-lg px-8 py-4 flex items-center space-x-2"
-            >
-              {/* Cambiado: usar texto S/. en lugar del icono de dólar */}
-              <span className="inline-flex items-center justify-center text-xl leading-none">S/.</span>
-              <span>Ver Precios</span>
-            </Link>
-            
-            <Link
-              to="/contact"
+            {hasMixes && (
+              <a
+                href="#mixes"
+                onClick={(e) => scrollTo(e, 'mixes')}
+                className="btn-primary text-lg px-8 py-4 flex items-center space-x-2"
+              >
+                <i className="fas fa-headphones" aria-hidden="true"></i>
+                <span>Escucha mis mixes</span>
+              </a>
+            )}
+
+            <a
+              href="#contact"
+              onClick={(e) => scrollTo(e, 'contact')}
               className="btn-secondary text-lg px-6 py-4 flex items-center space-x-2"
-              aria-label="Contáctame"
-              title="Contáctame"
             >
-              {/* Icono */}
-              <span className="inline-flex items-center justify-center text-xl leading-none" aria-hidden="true">
-                <i className="fas fa-envelope"></i>
-              </span>
-              {/* Texto visible */}
-              <span>Contáctame</span>
-            </Link>
+              <i className="fas fa-calendar-check" aria-hidden="true"></i>
+              <span>Reservar</span>
+            </a>
           </motion.div>
         </motion.div>
       </div>

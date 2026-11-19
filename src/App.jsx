@@ -12,6 +12,8 @@ import Footer from './components/Footer'
 import Privacy from './components/Privacy'
 import Terms from './components/Terms'
 import Testimonials from './components/Testimonials'
+import Genres from './components/Genres'
+import Mixes from './components/Mixes'
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -98,6 +100,8 @@ function App() {
               >
                 <Hero />
                 <About />
+                <Genres />
+                <Mixes />
                 <Services />
                 <Gallery />
                 <Testimonials />
