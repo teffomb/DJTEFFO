@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from './components/Navbar'
@@ -17,32 +17,6 @@ import Mixes from './components/Mixes'
 import WhatsAppFloat from './components/WhatsAppFloat'
 
 function App() {
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 1000)
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-dj-dark flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center"
-        >
-          <div className="text-dj-gold text-6xl mb-4">
-            <i className="fas fa-music"></i>
-          </div>
-          <div className="text-dj-gold font-dj text-2xl">DJ TEFFO</div>
-          <div className="mt-4">
-            <div className="w-16 h-1 bg-dj-gold mx-auto animate-pulse"></div>
-          </div>
-        </motion.div>
-      </div>
-    )
-  }
-
   function ScrollManager() {
     const location = useLocation()
 

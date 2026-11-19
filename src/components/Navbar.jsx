@@ -10,16 +10,18 @@ const LangToggle = ({ className = '' }) => {
     <button
       type="button"
       onClick={() => setLang(next)}
-      aria-label={t('nav.switchTo')}
+      aria-label={`${LANGS.map(c => c.toUpperCase()).join(' ')}: ${t('nav.switchTo')}`}
       className={`inline-flex items-center rounded-full border border-dj-gold/60 text-xs font-semibold overflow-hidden ${className}`}
     >
-      {LANGS.map(code => (
+      {LANGS.map((code, i) => (
+        <React.Fragment key={code}>
+        {i > 0 && ' '}
         <span
-          key={code}
           className={`px-3 py-1.5 ${code === lang ? 'bg-dj-gold text-dj-dark' : 'text-white'}`}
         >
           {code.toUpperCase()}
         </span>
+        </React.Fragment>
       ))}
     </button>
   )

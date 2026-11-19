@@ -21,7 +21,7 @@ const fromISODate = (isoDate) => {
 
 const normalizeDate = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
 
-const DatePicker = ({ name, value, onChange }) => {
+const DatePicker = ({ name, value, onChange, id }) => {
   const { t, locale } = useI18n()
   const WEEK_DAYS = useMemo(() => getWeekDays(locale), [locale])
   const selectedDate = useMemo(() => fromISODate(value), [value])
@@ -100,7 +100,8 @@ const DatePicker = ({ name, value, onChange }) => {
         onClick={() => setIsOpen(prev => !prev)}
         className="w-full text-left px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white focus:outline-none focus:border-dj-gold transition-colors"
         aria-expanded={isOpen}
-        aria-label={t('datePicker.open')}
+        id={id}
+        aria-label={`${t('datePicker.open')}: ${value ? selectedDate.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' }) : t('datePicker.placeholder')}`}
         whileHover={reducedMotion ? undefined : { scale: 1.01 }}
         whileTap={reducedMotion ? undefined : { scale: 0.99 }}
       >

@@ -114,7 +114,13 @@ const About = () => {
               {/* Placeholder for DJ image - use <img> with object-fit for better centering */}
               <div className="w-full h-96 bg-gradient-to-br from-dj-gold/20 to-dj-electric-blue/20 rounded-2xl flex items-center justify-center overflow-hidden">
                 <img
-                  src={`${base}Images/TeffoDJ.jpeg`}
+                  src={`${base}Images/TeffoDJ-768.webp`}
+                  srcSet={`${base}Images/TeffoDJ-480.webp 480w, ${base}Images/TeffoDJ-768.webp 768w`}
+                  sizes="(min-width: 1024px) 40rem, 100vw"
+                  width="768"
+                  height="1376"
+                  loading="lazy"
+                  decoding="async"
                   alt="DJ Teffo"
                   className="w-full h-full rounded-2xl object-cover"
                   style={{ objectPosition: bgPos }}

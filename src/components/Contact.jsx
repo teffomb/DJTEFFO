@@ -116,7 +116,7 @@ const Contact = () => {
   const whatsappUrl = buildWhatsappUrl(t('contact.whatsappMsg'))
 
   const socialLinks = [
-    { name: 'WhatsApp', icon: 'fab fa-whatsapp', url: whatsappUrl, color: 'bg-green-500' },
+    { name: 'WhatsApp', icon: 'fab fa-whatsapp', url: whatsappUrl, color: 'bg-green-700' },
     ...visibleSocials
   ]
 
@@ -185,12 +185,13 @@ const Contact = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="contact-name" className="block text-sm font-medium text-gray-300 mb-2">
                     {t('contact.name')}
                   </label>
                   <input
                     type="text"
                     name="name"
+                    id="contact-name"
                     value={formData.name}
                     onChange={handleInputChange}
                     required
@@ -199,13 +200,14 @@ const Contact = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="contact-reach" className="block text-sm font-medium text-gray-300 mb-2">
                     {t('contact.reach')}
                   </label>
                   <input
                     type="text"
                     inputMode="email"
                     name="reach"
+                    id="contact-reach"
                     value={formData.reach}
                     onChange={handleInputChange}
                     required
@@ -217,11 +219,12 @@ const Contact = () => {
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="contact-event" className="block text-sm font-medium text-gray-300 mb-2">
                     {t('contact.eventType')}
                   </label>
                   <select
                     name="eventType"
+                    id="contact-event"
                     value={formData.eventType}
                     onChange={handleInputChange}
                     required
@@ -238,11 +241,12 @@ const Contact = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 {isEs && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="contact-package" className="block text-sm font-medium text-gray-300 mb-2">
                     {t('contact.package')}
                   </label>
                   <select
                     name="packageType"
+                    id="contact-package"
                     value={formData.packageType}
                     onChange={handleInputChange}
                     required={isEs}
@@ -257,10 +261,11 @@ const Contact = () => {
                 )}
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="contact-date-btn" className="block text-sm font-medium text-gray-300 mb-2">
                     {t('contact.date')}
                   </label>
                   <DatePicker
+                    id="contact-date-btn"
                     name="date"
                     value={formData.date}
                     onChange={handleInputChange}
@@ -284,11 +289,12 @@ const Contact = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="contact-message" className="block text-sm font-medium text-gray-300 mb-2">
                   {t('contact.message')}
                 </label>
                 <textarea
                   name="message"
+                    id="contact-message"
                   value={formData.message}
                   onChange={handleInputChange}
                   required
@@ -398,7 +404,7 @@ const Contact = () => {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors"
+                className="inline-flex items-center bg-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 transition-colors"
               >
                 <i className="fab fa-whatsapp mr-2 text-xl"></i>
                 {t('contact.quickButton')}
