@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { genres } from '../data/genres'
 import { useI18n } from '../i18n'
 import { mixes } from '../data/mixes'
+import { HERO_VIDEO } from '../data/config'
 import { getMixEmbed } from './Mixes'
 
 const scrollTo = (e, id) => {
@@ -14,6 +15,9 @@ const scrollTo = (e, id) => {
   window.scrollTo({ top, behavior: 'smooth' })
 }
 
+const BASE = import.meta.env.BASE_URL
+const assetUrl = (p) => (!p ? undefined : /^(https?:)?\/\//.test(p) ? p : `${BASE}${p.replace(/^\//, '')}`)
+const hasHeroVideo = !!HERO_VIDEO.src
 const hasMixes = mixes.some(m => getMixEmbed(m.url))
 
 const Hero = () => {
@@ -103,6 +107,31 @@ const Hero = () => {
     <section ref={heroRef} className="hero min-h-screen flex items-center justify-center relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-dj-dark via-dj-gray to-dj-dark"></div>
       
+      {hasHeroVideo ? (
+        <>
+          <video
+            className="absolute inset-0 w-full h-full object-cover motion-reduce:hidden"
+            src={assetUrl(HERO_VIDEO.src)}
+            poster={assetUrl(HERO_VIDEO.poster)}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-hidden="true"
+          />
+          {HERO_VIDEO.poster && (
+            <img
+              className="absolute inset-0 w-full h-full object-cover hidden motion-reduce:block"
+              src={assetUrl(HERO_VIDEO.poster)}
+              alt=""
+              aria-hidden="true"
+            />
+          )}
+          {/* Capa oscura para que el texto siga legible sobre el video */}
+          <div className="absolute inset-0 bg-dj-dark/70"></div>
+        </>
+      ) : (
       <div className="absolute inset-0">
         <motion.div
           animate={{
@@ -129,6 +158,7 @@ const Hero = () => {
           className="absolute bottom-20 right-20 w-40 h-40 bg-dj-electric-blue/10 rounded-full blur-xl"
         />
       </div>
+      )}
 
       <div className="container-custom relative z-10 text-center">
         <motion.div
