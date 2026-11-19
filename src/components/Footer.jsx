@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useI18n } from '../i18n'
+import { EMAIL, PHONE_DISPLAY, visibleSocials, whatsappUrl } from '../data/socials'
 
 const Footer = () => {
   const { t, lang } = useI18n()
@@ -20,10 +21,8 @@ const Footer = () => {
   }
 
   const socialLinks = [
-    { icon: 'fab fa-whatsapp', url: `https://wa.me/51922798039?text=${encodeURIComponent(t('contact.whatsappMsg'))}`, color: 'hover:bg-green-500' },
-    { icon: 'fab fa-instagram', url: 'https://www.instagram.com/idk.teffo/', color: 'hover:bg-pink-500' },
-    { icon: 'fab fa-youtube', url: 'https://www.youtube.com/@DjTeffo-in5mt', color: 'hover:bg-red-600' },
-    { icon: 'fab fa-soundcloud', url: 'https://soundcloud.com/djteffo', color: 'hover:bg-orange-500' }
+    { icon: 'fab fa-whatsapp', name: 'WhatsApp', url: whatsappUrl(t('contact.whatsappMsg')), color: 'hover:bg-green-500' },
+    ...visibleSocials.map(s => ({ icon: s.icon, name: s.name, url: s.url, color: s.hover }))
   ]
 
   return (
@@ -63,6 +62,7 @@ const Footer = () => {
                     transition={{ duration: 0.3, delay: index * 0.1 }}
                     viewport={{ once: true }}
                     whileHover={{ scale: 1.1 }}
+                    aria-label={social.name}
                     className={`w-10 h-10 bg-dj-light-gray rounded-full flex items-center justify-center text-gray-300 transition-all duration-300 ${social.color}`}
                   >
                     <i className={social.icon}></i>
@@ -147,7 +147,7 @@ const Footer = () => {
                     <i className="fas fa-phone text-dj-dark text-sm"></i>
                   </div>
                   <span className="text-white text-sm">
-                    +51 922798039
+                    {PHONE_DISPLAY}
                   </span>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -155,7 +155,7 @@ const Footer = () => {
                     <i className="fas fa-envelope text-dj-dark text-sm"></i>
                   </div>
                   <span className="text-white text-sm">
-                    djdang45@gmail.com
+                    {EMAIL}
                   </span>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -237,7 +237,7 @@ const Footer = () => {
         viewport={{ once: true }}
         aria-label={t('footer.backToTop')}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-8 right-8 w-12 h-12 bg-dj-gold rounded-full flex items-center justify-center text-dj-dark hover:bg-yellow-400 transition-colors shadow-lg z-50"
+        className="fixed bottom-24 right-6 md:bottom-28 md:right-9 w-12 h-12 bg-dj-gold rounded-full flex items-center justify-center text-dj-dark hover:bg-yellow-400 transition-colors shadow-lg z-50"
       >
         <i className="fas fa-chevron-up"></i>
       </motion.button>

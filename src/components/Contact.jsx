@@ -4,6 +4,9 @@ import { useLocation } from 'react-router-dom'
 import DatePicker from './DatePicker'
 import { useI18n } from '../i18n'
 import es from '../i18n/es'
+import EpkButton from './EpkButton'
+import { FORMSPREE_ID } from '../data/config'
+import { EMAIL, PHONE_DISPLAY, PHONE_E164, whatsappUrl as buildWhatsappUrl, visibleSocials } from '../data/socials'
 
 const PACKAGE_VALUES = ['solo-dj', 'pack-principal', 'pack-fiesta']
 const PACKAGE_LABELS = {
@@ -15,26 +18,19 @@ const PACKAGE_LABELS = {
 // El correo que recibe el dueño siempre va en español.
 const EVENT_TYPE_LABELS = es.contact.eventTypes
 const EVENT_TYPE_KEYS = Object.keys(es.contact.eventTypes)
-const WHATSAPP_NUMBER = '51922798039'
+const FORMSPREE_ENDPOINT = FORMSPREE_ID ? `https://formspree.io/f/${FORMSPREE_ID}` : null
 
-const RECIPIENT_EMAIL = 'djdang45@gmail.com'
-const FORM_SUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${RECIPIENT_EMAIL}`
+const EMPTY_FORM = { name: '', reach: '', eventType: '', packageType: '', date: '', city: '', message: '' }
 
 const Contact = () => {
   const { t, lang } = useI18n()
   const isEs = lang === 'es'
   const location = useLocation()
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    eventType: '',
-    packageType: '',
-    date: '',
-    message: ''
-  })
+  const [formData, setFormData] = useState(EMPTY_FORM)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [successMsg, setSuccessMsg] = useState('')
   const [submitError, setSubmitError] = useState('')
   // Google Maps: read API key from Vite env var VITE_GOOGLE_MAPS_API_KEY
   // If not provided, we fall back to a simple embed URL that centers on "Comas, Lima, Peru".
@@ -66,48 +62,49 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setIsSubmitting(true)
     setSubmitError('')
 
-    const payload = {
+    // El correo que recibe el dueño siempre va en español.
+    const fields = {
       name: formData.name.trim(),
-      phone: formData.phone.trim(),
-      eventType: EVENT_TYPE_LABELS[formData.eventType] || formData.eventType,
-      packageType: PACKAGE_LABELS[formData.packageType] || formData.packageType,
-      date: formData.date || es.contact.notSpecified,
-      idioma: lang,
-      message: formData.message.trim(),
-      _subject: `Nuevo mensaje desde DJ TEFFO - ${formData.name.trim()}`,
-      _captcha: 'false',
-      _template: 'table'
+      contacto: formData.reach.trim(),
+      tipoDeEvento: EVENT_TYPE_LABELS[formData.eventType] || formData.eventType,
+      paquete: PACKAGE_LABELS[formData.packageType] || formData.packageType || '-',
+      fecha: formData.date || es.contact.notSpecified,
+      ciudad: formData.city.trim() || '-',
+      mensaje: formData.message.trim(),
+      idioma: lang
+    }
+    const subject = `Nuevo mensaje desde DJ TEFFO - ${fields.name}`
+
+    const finish = (message) => {
+      setSuccessMsg(message)
+      setSubmitSuccess(true)
+      setFormData(EMPTY_FORM)
+      setTimeout(() => setSubmitSuccess(false), 8000)
     }
 
+    // Sin ID de Formspree: fallback a mailto.
+    if (!FORMSPREE_ENDPOINT) {
+      const body = Object.entries(fields).map(([k, v]) => `${k}: ${v}`).join('\n')
+      window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      finish(t('contact.mailtoOpened', { email: EMAIL }))
+      return
+    }
+
+    setIsSubmitting(true)
     try {
-      const response = await fetch(FORM_SUBMIT_ENDPOINT, {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json'
-        },
-        body: JSON.stringify(payload)
-      })
-
-      if (response.ok) {
-        setSubmitSuccess(true)
-        setFormData({
-          name: '',
-          phone: '',
-          eventType: '',
-          packageType: '',
-          date: '',
-          message: ''
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          ...fields,
+          ...(fields.contacto.includes('@') ? { email: fields.contacto } : {}),
+          _subject: subject
         })
-
-        // Reset success message after 3 seconds
-        setTimeout(() => setSubmitSuccess(false), 3000)
-      } else {
-        setSubmitError(t('contact.error'))
-      }
+      })
+      if (response.ok) finish(t('contact.success'))
+      else setSubmitError(t('contact.error'))
     } catch (error) {
       console.error(error)
       setSubmitError(t('contact.error'))
@@ -116,38 +113,16 @@ const Contact = () => {
     }
   }
 
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('contact.whatsappMsg'))}`
+  const whatsappUrl = buildWhatsappUrl(t('contact.whatsappMsg'))
 
   const socialLinks = [
-    {
-      name: 'WhatsApp',
-      icon: 'fab fa-whatsapp',
-      url: whatsappUrl,
-      color: 'bg-green-500'
-    },
-    {
-      name: 'Instagram',
-      icon: 'fab fa-instagram',
-      url: 'https://www.instagram.com/idk.teffo/',
-      color: 'bg-pink-500'
-    },
-    {
-      name: 'YouTube',
-      icon: 'fab fa-youtube',
-      url: 'https://www.youtube.com/@DjTeffo-in5mt',
-      color: 'bg-red-600'
-    },
-    {
-      name: 'SoundCloud',
-      icon: 'fab fa-soundcloud',
-      url: 'https://soundcloud.com/djteffo',
-      color: 'bg-orange-500'
-    }
+    { name: 'WhatsApp', icon: 'fab fa-whatsapp', url: whatsappUrl, color: 'bg-green-500' },
+    ...visibleSocials
   ]
 
   const contactInfo = [
-    { icon: 'fas fa-phone', title: t('contact.info.phone'), value: '+51 922798039', action: 'tel:+51922798039' },
-    { icon: 'fas fa-envelope', title: t('contact.info.email'), value: 'djdang45@gmail.com', action: 'mailto:djdang45@gmail.com' },
+    { icon: 'fas fa-phone', title: t('contact.info.phone'), value: PHONE_DISPLAY, action: `tel:+${PHONE_E164}` },
+    { icon: 'fas fa-envelope', title: t('contact.info.email'), value: EMAIL, action: `mailto:${EMAIL}` },
     { icon: 'fas fa-map-marker-alt', title: t('contact.info.location'), value: t('contact.locationValue'), action: '#' },
     ...(t('contact.hoursValue')
       ? [{ icon: 'fas fa-clock', title: t('contact.info.hours'), value: t('contact.hoursValue'), action: '#' }]
@@ -192,7 +167,7 @@ const Contact = () => {
                 className="bg-green-500/20 border border-green-500 text-green-400 p-4 rounded-lg mb-6 flex items-center"
               >
                 <i className="fas fa-check-circle mr-3 text-xl"></i>
-                <span>{t('contact.success')}</span>
+                <span>{successMsg}</span>
               </motion.div>
             )}
 
@@ -225,16 +200,17 @@ const Contact = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    {t('contact.phone')}
+                    {t('contact.reach')}
                   </label>
                   <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
+                    type="text"
+                    inputMode="email"
+                    name="reach"
+                    value={formData.reach}
                     onChange={handleInputChange}
                     required
                     className="w-full px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-dj-gold transition-colors"
-                    placeholder={t('contact.phonePh')}
+                    placeholder={t('contact.reachPh')}
                   />
                 </div>
               </div>
@@ -288,6 +264,21 @@ const Contact = () => {
                     name="date"
                     value={formData.date}
                     onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label htmlFor="contact-city" className="block text-sm font-medium text-gray-300 mb-2">
+                    {t('contact.city')}
+                  </label>
+                  <input
+                    id="contact-city"
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-dj-gold transition-colors"
+                    placeholder={t('contact.cityPh')}
                   />
                 </div>
               </div>
@@ -412,6 +403,7 @@ const Contact = () => {
                 <i className="fab fa-whatsapp mr-2 text-xl"></i>
                 {t('contact.quickButton')}
               </motion.a>
+              <EpkButton className="mt-4 w-full sm:w-auto sm:ml-4 sm:mt-0" />
             </div>
           </motion.div>
         </div>

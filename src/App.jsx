@@ -14,6 +14,7 @@ import Terms from './components/Terms'
 import Testimonials from './components/Testimonials'
 import Genres from './components/Genres'
 import Mixes from './components/Mixes'
+import WhatsAppFloat from './components/WhatsAppFloat'
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -88,6 +89,7 @@ function App() {
     <Router basename={import.meta.env.BASE_URL}>
       <div className="App">
         <ScrollManager />
+        <WhatsAppFloat />
         <Navbar />
         <AnimatePresence mode="wait">
           <Routes>
