@@ -16,10 +16,10 @@ const Footer = () => {
       { name: 'Sobre Mí', path: '/#about' },
       { name: 'Galería', path: '/#gallery' },
       { name: 'Testimonios', path: '/#testimonials' },
-      { name: 'Precios', path: '/pricing' }
+      { name: 'Precios', path: '/#pricing' }
     ],
     contacto: [
-      { name: 'Contacto', path: '/contact' },
+      { name: 'Contacto', path: '/#contact' },
       { name: 'WhatsApp', path: 'https://wa.me/+1234567890' },
       { name: 'Instagram', path: 'https://instagram.com/djprofessional' },
       { name: 'Facebook', path: 'https://facebook.com/djprofessional' }
@@ -154,7 +154,7 @@ const Footer = () => {
                   <div className="w-8 h-8 bg-dj-gold rounded-full flex items-center justify-center">
                     <i className="fas fa-phone text-dj-dark text-sm"></i>
                   </div>
-                  <span className="text-gray-300 text-sm">
+                  <span className="text-white text-sm">
                     +51 922798039
                   </span>
                 </div>
@@ -162,7 +162,7 @@ const Footer = () => {
                   <div className="w-8 h-8 bg-dj-gold rounded-full flex items-center justify-center">
                     <i className="fas fa-envelope text-dj-dark text-sm"></i>
                   </div>
-                  <span className="text-gray-300 text-sm">
+                  <span className="text-white text-sm">
                     djdang45@gmail.com
                   </span>
                 </div>
@@ -170,7 +170,7 @@ const Footer = () => {
                   <div className="w-8 h-8 bg-dj-gold rounded-full flex items-center justify-center">
                     <i className="fas fa-map-marker-alt text-dj-dark text-sm"></i>
                   </div>
-                  <span className="text-gray-300 text-sm">
+                  <span className="text-white text-sm">
                     Lima, Comas
                   </span>
                 </div>
@@ -221,18 +221,15 @@ const Footer = () => {
           className="border-t border-dj-light-gray py-6"
         >
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                         <div className="text-gray-400 text-sm">
+                         <div className="text-gray-300 text-sm">
                © {currentYear} DJ TEFFO. Todos los derechos reservados.
              </div>
             <div className="flex space-x-6 text-sm">
-              <Link to="/privacy" className="text-gray-400 hover:text-dj-gold transition-colors">
+              <Link to="/privacy" className="text-gray-300 hover:text-dj-gold transition-colors">
                 Política de Privacidad
               </Link>
-              <Link to="/terms" className="text-gray-400 hover:text-dj-gold transition-colors">
+              <Link to="/terms" className="text-gray-300 hover:text-dj-gold transition-colors">
                 Términos de Servicio
-              </Link>
-              <Link to="/cookies" className="text-gray-400 hover:text-dj-gold transition-colors">
-                Cookies
               </Link>
             </div>
           </div>

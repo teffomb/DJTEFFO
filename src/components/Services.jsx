@@ -36,6 +36,12 @@ const Services = () => {
       features: ['Música personalizada', 'Ambiente íntimo', 'Flexibilidad horaria', 'Servicio completo']
     },
     {
+      icon: 'fas fa-briefcase',
+      title: 'Eventos Corporativos',
+      description: 'Fiestas de fin de año, lanzamientos, aniversarios de empresa y activaciones con música a la medida de tu marca.',
+      features: ['Música acorde al público', 'Coordinación con producción', 'Presentaciones y brindis', 'Puntualidad y formalidad']
+    },
+    {
       icon: 'fas fa-calendar-alt',
       title: 'Eventos Especiales',
       description: 'Graduaciones, aniversarios, inauguraciones y cualquier ocasión especial que requiera música.',
@@ -44,16 +50,16 @@ const Services = () => {
   ]
 
   return (
-    <section id="services" className="section-padding bg-dj-dark">
+    <section id="services" className="section-padding bg-dj-dark pb-12 md:pb-12">
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6">
+          <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6 pb-1 leading-tight">
             <span className="text-gradient">Mis Servicios</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -124,7 +130,7 @@ const Services = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
           viewport={{ once: true }}
-          className="text-center mt-16"
+          className="text-center mt-12"
         >
           <div className="bg-gradient-to-r from-dj-gold/10 to-dj-electric-blue/10 rounded-2xl p-8 border border-dj-gold/20">
             <h3 className="text-2xl font-dj font-bold text-dj-gold mb-4">

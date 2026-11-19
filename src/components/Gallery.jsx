@@ -52,16 +52,16 @@ const Gallery = () => {
   }
 
   return (
-  <section id="gallery" className="section-padding bg-dj-gray">
+  <section id="gallery" className="section-padding bg-dj-gray overflow-hidden">
     <div className="container-custom">
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
-        className="text-center mb-16"
+        className="text-center mb-10"
       >
-        <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6">
+        <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6 pb-1 leading-tight">
           <span className="text-gradient">Galería</span>
         </h2>
         <p className="text-xl text-gray-300 max-w-3xl mx-auto">

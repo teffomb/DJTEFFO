@@ -19,10 +19,11 @@ const Navbar = () => {
 
   const navItems = [
     { name: 'Inicio', path: '/', type: 'route' },
+    { name: 'Sobre mí', path: '#about', type: 'anchor' },
     { name: 'Servicios', path: '#services', type: 'anchor' },
     { name: 'Galería', path: '#gallery', type: 'anchor' },
-    { name: 'Precios', path: '/pricing', type: 'route' },
-    { name: 'Contacto', path: '/contact', type: 'route' }
+    { name: 'Precios', path: '#pricing', type: 'anchor' },
+    { name: 'Contacto', path: '#contact', type: 'anchor' }
   ]
 
   const scrollToId = (id) => {

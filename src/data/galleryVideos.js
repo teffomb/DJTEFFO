@@ -20,7 +20,7 @@ const uploads = [
     'v1792813529/IMG_1169',
     'v1792813528/IMG_8044',
   ] },
-  { category: 'Quinceañeros', assets: [
+  { category: 'Quinceañeras', assets: [
     'v1792813523/IMG_7055',
     'v1792813516/IMG_1319',
   ] },

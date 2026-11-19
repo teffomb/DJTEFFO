@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
@@ -101,27 +101,13 @@ function App() {
                 <Services />
                 <Gallery />
                 <Testimonials />
+                <Pricing />
+                <Contact />
                 <Footer />
               </motion.div>
             } />
-            <Route
-              path="/pricing"
-              element={(
-                <>
-                  <Pricing />
-                  <Footer />
-                </>
-              )}
-            />
-            <Route
-              path="/contact"
-              element={(
-                <>
-                  <Contact />
-                  <Footer />
-                </>
-              )}
-            />
+            <Route path="/pricing" element={<Navigate to="/#pricing" replace />} />
+            <Route path="/contact" element={<Navigate to="/#contact" replace />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
           </Routes>

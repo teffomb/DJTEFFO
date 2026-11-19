@@ -85,18 +85,19 @@ const Pricing = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-dj-dark pt-20">
+    <section id="pricing" className="section-padding bg-dj-gray">
       <div className="container-custom">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-6xl font-dj font-bold mb-6 drop-shadow-neon">
+          <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6 pb-1 leading-tight drop-shadow-neon">
             <span className="text-gradient-neon">Precios</span>
-          </h1>
+          </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
             ¡Tu música, tu estilo, tu presupuesto! Paquetes diseñados para que solo te preocupes por disfrutar.<br/>
             <span className="inline-block mt-2 px-4 py-1 bg-dj-gold/20 text-dj-gold rounded-full font-bold animate-pulse border border-dj-gold shadow-neon">Pago Único · ¡Solo pagas una vez!</span>
@@ -183,7 +184,7 @@ const Pricing = () => {
                   </div>
                 )}
                 <Link
-                  to={`/contact?package=${pkg.slug}`}
+                  to={`/?package=${pkg.slug}#contact`}
                   className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-neon hover:scale-105 active:scale-95 ${pkg.popular ? 'bg-gradient-to-r from-dj-gold to-fuchsia-400 text-dj-dark hover:from-yellow-300 hover:to-pink-400' : 'bg-transparent border-2 border-dj-gold text-dj-gold hover:bg-dj-gold hover:text-dj-dark'}`}
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
@@ -303,7 +304,7 @@ const Pricing = () => {
               y crear un paquete personalizado para tu evento.
             </p>
             <Link
-              to="/contact"
+              to="/#contact"
               className="btn-primary text-lg px-8 py-4"
             >
               <i className="fas fa-envelope mr-2"></i>
@@ -312,7 +313,7 @@ const Pricing = () => {
           </div>
         </motion.div>
       </div>
-    </div>
+    </section>
   )
 }
 

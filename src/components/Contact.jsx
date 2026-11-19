@@ -170,18 +170,19 @@ const Contact = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-dj-dark pt-20">
+    <section id="contact" className="section-padding bg-dj-dark">
       <div className="container-custom">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-6xl font-dj font-bold mb-6">
+          <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6 pb-1 leading-tight">
             <span className="text-gradient">Contáctame</span>
-          </h1>
+          </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             ¿Listo para hacer de tu evento algo inolvidable? 
             Contáctame y conversemos sobre tus ideas.
@@ -464,7 +465,7 @@ const Contact = () => {
               </div>
         </motion.div>
       </div>
-    </div>
+    </section>
   )
 }
 
