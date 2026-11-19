@@ -1,8 +1,10 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { genres } from '../data/genres'
+import { useI18n } from '../i18n'
 
 const Genres = () => {
+  const { t } = useI18n()
   if (!genres.length) return null
   return (
     <section id="genres" className="section-padding bg-dj-dark">
@@ -15,10 +17,10 @@ const Genres = () => {
           className="text-center mb-10"
         >
           <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6 pb-1 leading-tight">
-            <span className="text-gradient">Géneros</span>
+            <span className="text-gradient">{t('genres.title')}</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Lo que suena en mis sets, de los clásicos a lo que está sonando hoy.
+            {t('genres.subtitle')}
           </p>
         </motion.div>
 

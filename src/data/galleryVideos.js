@@ -40,6 +40,7 @@ const cloudinaryVideos = uploads.flatMap(({ category, assets }) =>
   assets.map((asset, index) => ({
     id: asset,
     category,
+    autoTitle: index + 1, // título traducido en Gallery.jsx
     title: `${category} · Video ${index + 1}`,
     type: 'mp4',
     orientation: 'portrait',

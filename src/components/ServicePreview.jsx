@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { useI18n } from '../i18n'
 
 const ServicePreview = ({ services, activeIndex, onNavigate, onClose }) => {
+  const { t } = useI18n()
   const dialogRef = useRef(null)
   const returnFocusRef = useRef(document.activeElement)
   const service = services[activeIndex]
@@ -40,7 +42,7 @@ const ServicePreview = ({ services, activeIndex, onNavigate, onClose }) => {
         <button
           type="button"
           autoFocus
-          aria-label="Cerrar vista previa"
+          aria-label={t('services.previewClose')}
           onClick={() => dialogRef.current.close()}
           className="flex min-w-[44px] min-h-[44px] items-center justify-center rounded-full text-2xl hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-dj-gold"
         >
@@ -62,7 +64,7 @@ const ServicePreview = ({ services, activeIndex, onNavigate, onClose }) => {
         </div>
 
         <div className="mt-8 rounded-2xl border border-white/10 bg-dj-dark/40 p-6">
-          <h3 className="text-lg font-semibold text-dj-gold mb-4">Incluye:</h3>
+          <h3 className="text-lg font-semibold text-dj-gold mb-4">{t('services.includes')}</h3>
           <ul className="space-y-3">
             {service.features.map(feature => (
               <li key={feature} className="flex items-start gap-3 text-base md:text-lg text-gray-200 leading-relaxed">
@@ -75,11 +77,11 @@ const ServicePreview = ({ services, activeIndex, onNavigate, onClose }) => {
       </div>
 
       <div className="sticky bottom-0 flex justify-between gap-4 border-t border-white/10 bg-dj-gray px-6 py-4">
-        <button type="button" aria-label="Servicio anterior" onClick={() => onNavigate(-1)} className="flex items-center justify-center gap-3 min-h-[44px] px-4 rounded-full bg-white/10 hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-dj-gold">
-          <span aria-hidden="true">←</span> Anterior
+        <button type="button" aria-label={t('services.previewPrev')} onClick={() => onNavigate(-1)} className="flex items-center justify-center gap-3 min-h-[44px] px-4 rounded-full bg-white/10 hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-dj-gold">
+          <span aria-hidden="true">←</span> {t('services.prev')}
         </button>
-        <button type="button" aria-label="Servicio siguiente" onClick={() => onNavigate(1)} className="flex items-center justify-center gap-3 min-h-[44px] px-4 rounded-full bg-dj-gold text-dj-dark hover:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
-          Siguiente <span aria-hidden="true">→</span>
+        <button type="button" aria-label={t('services.previewNext')} onClick={() => onNavigate(1)} className="flex items-center justify-center gap-3 min-h-[44px] px-4 rounded-full bg-dj-gold text-dj-dark hover:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
+          {t('services.next')} <span aria-hidden="true">→</span>
         </button>
       </div>
     </dialog>,

@@ -1,10 +1,14 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useI18n } from '../i18n'
 
 const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState('hourly')
   const [hoveredIndex, setHoveredIndex] = useState(null)
+  const { lang } = useI18n()
+  // Contenido solo en español (precios en soles). En inglés no hay precios fijos: el nav lleva a Contact.
+  if (lang !== 'es') return null
 
   const packages = [
     {

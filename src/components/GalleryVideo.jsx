@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useI18n } from '../i18n'
 
 const PLATFORM_ICON = {
   youtube: 'fab fa-youtube',
@@ -20,6 +21,7 @@ export const VideoPoster = ({ poster, title, type, className = '', imgProps = {}
 
 // El video/iframe se monta solo tras hacer clic: no se descarga nada antes.
 const GalleryVideo = ({ type, src, embedSrc, poster, title, orientation, onPlaybackChange }) => {
+  const { t } = useI18n()
   const videoRef = useRef(null)
   const [started, setStarted] = useState(false)
   const [failed, setFailed] = useState(false)
@@ -69,7 +71,7 @@ const GalleryVideo = ({ type, src, embedSrc, poster, title, orientation, onPlayb
             onPlaybackChange?.(false)
           }}
         >
-          Tu navegador no puede reproducir este video.
+          {t('gallery.unsupported')}
         </video>
       )}
       {started && !isFile && (
@@ -86,7 +88,7 @@ const GalleryVideo = ({ type, src, embedSrc, poster, title, orientation, onPlayb
         <button
           type="button"
           className="relative block w-full h-full group focus-visible:outline focus-visible:outline-2 focus-visible:outline-dj-gold focus-visible:-outline-offset-4"
-          aria-label={`Reproducir: ${title}`}
+          aria-label={t('gallery.play', { title })}
           onClick={() => {
             onPlaybackChange?.(true)
             setStarted(true)
@@ -107,12 +109,12 @@ const GalleryVideo = ({ type, src, embedSrc, poster, title, orientation, onPlayb
       )}
       {failed && (
         <div role="alert" className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/90 p-6 text-center">
-          <p>No se pudo cargar el video. Inténtalo de nuevo.</p>
+          <p>{t('gallery.failed')}</p>
           <button type="button" className="btn-primary" onClick={() => {
             setFailed(false)
             setStarted(false)
           }}>
-            Volver a intentar
+            {t('gallery.retry')}
           </button>
         </div>
       )}

@@ -1,8 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useI18n, LANGS } from '../i18n'
+
+const LangToggle = ({ className = '' }) => {
+  const { lang, setLang, t } = useI18n()
+  const next = lang === 'es' ? 'en' : 'es'
+  return (
+    <button
+      type="button"
+      onClick={() => setLang(next)}
+      aria-label={t('nav.switchTo')}
+      className={`inline-flex items-center rounded-full border border-dj-gold/60 text-xs font-semibold overflow-hidden ${className}`}
+    >
+      {LANGS.map(code => (
+        <span
+          key={code}
+          className={`px-3 py-1.5 ${code === lang ? 'bg-dj-gold text-dj-dark' : 'text-white'}`}
+        >
+          {code.toUpperCase()}
+        </span>
+      ))}
+    </button>
+  )
+}
 
 const Navbar = () => {
+  const { lang, t } = useI18n()
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
@@ -17,13 +41,18 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // ES: Precios + Contacto. EN: sin precios fijos, "Request a Quote" lleva al formulario.
   const navItems = [
-    { name: 'Inicio', path: '/', type: 'route' },
-    { name: 'Sobre mí', path: '#about', type: 'anchor' },
-    { name: 'Servicios', path: '#services', type: 'anchor' },
-    { name: 'Galería', path: '#gallery', type: 'anchor' },
-    { name: 'Precios', path: '#pricing', type: 'anchor' },
-    { name: 'Contacto', path: '#contact', type: 'anchor' }
+    { name: t('nav.home'), path: '/', type: 'route' },
+    { name: t('nav.about'), path: '#about', type: 'anchor' },
+    { name: t('nav.services'), path: '#services', type: 'anchor' },
+    { name: t('nav.gallery'), path: '#gallery', type: 'anchor' },
+    ...(lang === 'es'
+      ? [
+          { name: t('nav.pricing'), path: '#pricing', type: 'anchor' },
+          { name: t('nav.contact'), path: '#contact', type: 'anchor' }
+        ]
+      : [{ name: t('nav.pricing'), path: '#contact', type: 'anchor' }])
   ]
 
   const scrollToId = (id) => {
@@ -111,13 +140,20 @@ const Navbar = () => {
             })}
           </div>
 
+          <LangToggle className="hidden md:inline-flex" />
+
           {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-3">
+          <LangToggle />
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-white hover:text-dj-gold transition-colors"
+            aria-label={isOpen ? t('nav.closeMenu') : t('nav.menu')}
+            aria-expanded={isOpen}
+            className="text-white hover:text-dj-gold transition-colors"
           >
             <i className={`fas ${isOpen ? 'fa-times' : 'fa-bars'} text-xl`}></i>
           </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}

@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { useI18n } from '../i18n'
 
-const WEEK_DAYS = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom']
-const MONTHS = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-]
+// Nombres de meses y días generados con Intl según el idioma (semana inicia en lunes).
+const getWeekDays = (locale) => Array.from({ length: 7 }, (_, i) =>
+  new Date(2024, 0, 1 + i).toLocaleDateString(locale, { weekday: 'short' }).replace('.', ''))
+const getMonthName = (locale, month) =>
+  new Date(2024, month, 1).toLocaleDateString(locale, { month: 'long' })
 
 const pad2 = (value) => String(value).padStart(2, '0')
 
@@ -21,6 +22,8 @@ const fromISODate = (isoDate) => {
 const normalizeDate = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate())
 
 const DatePicker = ({ name, value, onChange }) => {
+  const { t, locale } = useI18n()
+  const WEEK_DAYS = useMemo(() => getWeekDays(locale), [locale])
   const selectedDate = useMemo(() => fromISODate(value), [value])
   const today = useMemo(() => normalizeDate(new Date()), [])
   const todayIso = useMemo(() => toISODate(today), [today])
@@ -51,7 +54,7 @@ const DatePicker = ({ name, value, onChange }) => {
     return () => document.removeEventListener('mousedown', handleOutsideClick)
   }, [])
 
-  const monthLabel = `${MONTHS[visibleMonth.getMonth()]} ${visibleMonth.getFullYear()}`
+  const monthLabel = `${getMonthName(locale, visibleMonth.getMonth())} ${visibleMonth.getFullYear()}`
 
   const firstDayMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1)
   const dayOffset = (firstDayMonth.getDay() + 6) % 7
@@ -97,12 +100,12 @@ const DatePicker = ({ name, value, onChange }) => {
         onClick={() => setIsOpen(prev => !prev)}
         className="w-full text-left px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white focus:outline-none focus:border-dj-gold transition-colors"
         aria-expanded={isOpen}
-        aria-label="Seleccionar fecha del evento"
+        aria-label={t('datePicker.open')}
         whileHover={reducedMotion ? undefined : { scale: 1.01 }}
         whileTap={reducedMotion ? undefined : { scale: 0.99 }}
       >
         <span className={value ? 'text-white' : 'text-gray-400'}>
-          {value ? selectedDate.toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Selecciona una fecha'}
+          {value ? selectedDate.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' }) : t('datePicker.placeholder')}
         </span>
         <motion.i
           className="fas fa-calendar-alt float-right text-dj-gold mt-1"
@@ -126,7 +129,7 @@ const DatePicker = ({ name, value, onChange }) => {
                 onClick={() => changeMonth(-1)}
                 disabled={!canGoPrevious}
                 className="h-9 w-9 rounded-full border border-gray-600 text-gray-200 hover:border-dj-gold hover:text-dj-gold disabled:cursor-not-allowed disabled:opacity-40"
-                aria-label="Mes anterior"
+                aria-label={t('datePicker.prevMonth')}
                 whileHover={canGoPrevious && !reducedMotion ? { scale: 1.08, x: -1 } : undefined}
                 whileTap={canGoPrevious && !reducedMotion ? { scale: 0.92 } : undefined}
               >
@@ -150,7 +153,7 @@ const DatePicker = ({ name, value, onChange }) => {
                 type="button"
                 onClick={() => changeMonth(1)}
                 className="h-9 w-9 rounded-full border border-gray-600 text-gray-200 hover:border-dj-gold hover:text-dj-gold"
-                aria-label="Mes siguiente"
+                aria-label={t('datePicker.nextMonth')}
                 whileHover={reducedMotion ? undefined : { scale: 1.08, x: 1 }}
                 whileTap={reducedMotion ? undefined : { scale: 0.92 }}
               >
@@ -193,7 +196,7 @@ const DatePicker = ({ name, value, onChange }) => {
                         disabled={day.isDisabled}
                         onClick={() => selectDate(day.iso)}
                         className={`${baseClasses} ${styles}`}
-                        aria-label={`Seleccionar ${day.date.toLocaleDateString('es-PE')}`}
+                        aria-label={t('datePicker.pick', { date: day.date.toLocaleDateString(locale) })}
                         initial={reducedMotion ? false : { opacity: 0, y: 6, scale: 0.96 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         transition={{ duration: 0.18, delay: reducedMotion ? 0 : index * 0.008 }}

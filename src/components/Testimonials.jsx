@@ -1,8 +1,10 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { testimonials } from '../data/testimonials'
+import { useI18n } from '../i18n'
 
 const Testimonials = () => {
+  const { t } = useI18n()
   // Sin testimonios reales cargados, la sección no se muestra.
   if (!testimonials.length) return null
 
@@ -17,41 +19,41 @@ const Testimonials = () => {
           className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6 pb-1 leading-tight">
-            <span className="text-gradient">Testimonios</span>
+            <span className="text-gradient">{t('testimonials.title')}</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Lo que dicen mis clientes sobre mi trabajo.
+            {t('testimonials.subtitle')}
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {testimonials.map((t, index) => (
+          {testimonials.map((item, index) => (
             <motion.figure
-              key={`${t.name}-${index}`}
+              key={`${item.name}-${index}`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
               className="bg-dj-gray rounded-2xl p-6 border border-dj-light-gray flex flex-col"
             >
-              {t.image && (
+              {item.image && (
                 <img
-                  src={`${import.meta.env.BASE_URL}${t.image}`}
-                  alt={`Captura del mensaje de ${t.name}`}
+                  src={`${import.meta.env.BASE_URL}${item.image}`}
+                  alt={t('testimonials.screenshotAlt', { name: item.name })}
                   loading="lazy"
                   decoding="async"
                   className="w-full max-h-96 object-contain rounded-lg mb-4 bg-black"
                 />
               )}
-              {t.text && (
+              {item.text && (
                 <blockquote className="text-gray-300 leading-relaxed italic mb-4">
-                  “{t.text}”
+                  “{item.text}”
                 </blockquote>
               )}
               <figcaption className="mt-auto">
-                <div className="font-dj font-bold text-dj-gold">{t.name}</div>
+                <div className="font-dj font-bold text-dj-gold">{item.name}</div>
                 <div className="text-sm text-gray-300">
-                  {t.event}{t.date ? ` · ${t.date}` : ''}
+                  {item.event}{item.date ? ` · ${item.date}` : ''}
                 </div>
               </figcaption>
             </motion.figure>

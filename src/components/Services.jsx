@@ -1,53 +1,22 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import ServicePreview from './ServicePreview'
+import { useI18n } from '../i18n'
 
 const Services = () => {
   const [selectedIndex, setSelectedIndex] = useState(null)
-  const services = [
-    {
-      icon: 'fas fa-heart',
-      title: 'Bodas',
-      description: 'Hacemos de tu día especial algo mágico con música romántica y ritmos que harán bailar a todos tus invitados.',
-      features: ['Música romántica', 'Primer baile', 'Playlist personalizada', 'Coordinación con maestro de ceremonia']
-    },
-    {
-      icon: 'fas fa-birthday-cake',
-      title: 'Fiestas de Cumpleaños',
-      description: 'Celebra tu cumpleaños con el mejor ambiente musical, desde los 15 hasta los 100 años.',
-      features: ['Música actual', 'Juegos musicales', 'Animación', 'Efectos especiales']
-    },
-    {
-      icon: 'fas fa-baby',
-      title: 'Eventos Infantiles',
-      description: 'Los más pequeños se divierten con música infantil, juegos y animación especial para niños.',
-      features: ['Música infantil', 'Juegos interactivos', 'Animadora o Payaso', 'Efectos de luces']
-    },
-    {
-      icon: 'fas fa-crown',
-      title: 'XV',
-      description: 'Celebra tus XV años con la mejor música y animación para una noche inolvidable.',
-      features: ['Música variada', 'Animación especial', 'Luces y efectos', 'Momentos coreografiados']
-    },
-    {
-      icon: 'fas fa-glass-cheers',
-      title: 'Fiestas Privadas',
-      description: 'Desde reuniones íntimas hasta grandes celebraciones, creamos el ambiente perfecto.',
-      features: ['Música personalizada', 'Ambiente íntimo', 'Flexibilidad horaria', 'Servicio completo']
-    },
-    {
-      icon: 'fas fa-briefcase',
-      title: 'Eventos Corporativos',
-      description: 'Fiestas de fin de año, lanzamientos, aniversarios de empresa y activaciones con música a la medida de tu marca.',
-      features: ['Música acorde al público', 'Coordinación con producción', 'Presentaciones y brindis', 'Puntualidad y formalidad']
-    },
-    {
-      icon: 'fas fa-calendar-alt',
-      title: 'Eventos Especiales',
-      description: 'Graduaciones, aniversarios, inauguraciones y cualquier ocasión especial que requiera música.',
-      features: ['Temática personalizada', 'Música específica', 'Coordinación completa', 'Soporte técnico']
-    }
-  ]
+  const { t } = useI18n()
+  const icons = {
+    weddings: 'fas fa-heart',
+    birthdays: 'fas fa-birthday-cake',
+    kids: 'fas fa-baby',
+    quince: 'fas fa-crown',
+    private: 'fas fa-glass-cheers',
+    latin: 'fas fa-compact-disc',
+    corporate: 'fas fa-briefcase',
+    special: 'fas fa-calendar-alt',
+  }
+  const services = t('services.items').map(item => ({ ...item, icon: icons[item.id] }))
 
   return (
     <section id="services" className="section-padding bg-dj-dark pb-12 md:pb-12">
@@ -60,11 +29,10 @@ const Services = () => {
           className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6 pb-1 leading-tight">
-            <span className="text-gradient">Mis Servicios</span>
+            <span className="text-gradient">{t('services.title')}</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Ofrezco una amplia gama de servicios para hacer de tu evento algo inolvidable. 
-            Cada ocasión es única y me adapto a tus necesidades específicas.
+            {t('services.subtitle')}
           </p>
         </motion.div>
 
@@ -92,7 +60,7 @@ const Services = () => {
 
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold text-dj-gold mb-3">
-                  Incluye:
+                  {t('services.includes')}
                 </h4>
                 {service.features.map((feature, featureIndex) => (
                   <motion.div
@@ -111,7 +79,7 @@ const Services = () => {
 
               <button
                 type="button"
-                aria-label={`Ampliar información de ${service.title}`}
+                aria-label={t('services.expand', { title: service.title })}
                 aria-haspopup="dialog"
                 onClick={() => setSelectedIndex(index)}
                 className="absolute inset-0 w-full h-full cursor-pointer bg-gradient-to-br from-dj-gold/5 to-dj-electric-blue/5 rounded-2xl opacity-0 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-dj-gold transition-opacity duration-300"
@@ -134,20 +102,27 @@ const Services = () => {
         >
           <div className="bg-gradient-to-r from-dj-gold/10 to-dj-electric-blue/10 rounded-2xl p-8 border border-dj-gold/20">
             <h3 className="text-2xl font-dj font-bold text-dj-gold mb-4">
-              ¿No encuentras lo que buscas?
+              {t('services.ctaTitle')}
             </h3>
             <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Cada evento es único y me adapto a tus necesidades específicas. 
-              Contáctame para discutir tu evento personalizado.
+              {t('services.ctaText')}
             </p>
-            <motion.button
+            <motion.a
+              href="#contact"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="btn-primary"
+              onClick={(e) => {
+                const el = document.getElementById('contact')
+                if (!el) return
+                e.preventDefault()
+                const nav = document.querySelector('nav')
+                window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - (nav ? nav.offsetHeight : 80) - 10, behavior: 'smooth' })
+              }}
+              className="btn-primary inline-block"
             >
               <i className="fas fa-envelope mr-2"></i>
-              Consulta Personalizada
-            </motion.button>
+              {t('services.ctaButton')}
+            </motion.a>
           </div>
         </motion.div>
       </div>

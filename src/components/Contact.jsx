@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 import DatePicker from './DatePicker'
+import { useI18n } from '../i18n'
+import es from '../i18n/es'
 
 const PACKAGE_VALUES = ['solo-dj', 'pack-principal', 'pack-fiesta']
 const PACKAGE_LABELS = {
@@ -10,19 +12,17 @@ const PACKAGE_LABELS = {
   'pack-fiesta': 'Pack Fiesta - S/. 499'
 }
 
-const EVENT_TYPE_LABELS = {
-  boda: 'Boda',
-  cumpleanos: 'Cumpleaños',
-  corporativo: 'Evento Corporativo',
-  infantil: 'Evento Infantil',
-  privado: 'Fiesta Privada',
-  otro: 'Otro'
-}
+// El correo que recibe el dueño siempre va en español.
+const EVENT_TYPE_LABELS = es.contact.eventTypes
+const EVENT_TYPE_KEYS = Object.keys(es.contact.eventTypes)
+const WHATSAPP_NUMBER = '51922798039'
 
 const RECIPIENT_EMAIL = 'djdang45@gmail.com'
 const FORM_SUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${RECIPIENT_EMAIL}`
 
 const Contact = () => {
+  const { t, lang } = useI18n()
+  const isEs = lang === 'es'
   const location = useLocation()
   const [formData, setFormData] = useState({
     name: '',
@@ -74,7 +74,8 @@ const Contact = () => {
       phone: formData.phone.trim(),
       eventType: EVENT_TYPE_LABELS[formData.eventType] || formData.eventType,
       packageType: PACKAGE_LABELS[formData.packageType] || formData.packageType,
-      date: formData.date || 'No especificada',
+      date: formData.date || es.contact.notSpecified,
+      idioma: lang,
       message: formData.message.trim(),
       _subject: `Nuevo mensaje desde DJ TEFFO - ${formData.name.trim()}`,
       _captcha: 'false',
@@ -105,21 +106,23 @@ const Contact = () => {
         // Reset success message after 3 seconds
         setTimeout(() => setSubmitSuccess(false), 3000)
       } else {
-        setSubmitError('No se pudo enviar automáticamente. Inténtalo de nuevo en unos segundos.')
+        setSubmitError(t('contact.error'))
       }
     } catch (error) {
       console.error(error)
-      setSubmitError('No se pudo enviar automáticamente. Inténtalo de nuevo en unos segundos.')
+      setSubmitError(t('contact.error'))
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('contact.whatsappMsg'))}`
+
   const socialLinks = [
     {
       name: 'WhatsApp',
       icon: 'fab fa-whatsapp',
-      url: 'https://wa.me/51922798039?text=Hola%20deseo%20m%C3%A1s%20informaci%C3%B3n%20sobre%20sus%20servicios%20de%20DJ%20%F0%9F%98%81',
+      url: whatsappUrl,
       color: 'bg-green-500'
     },
     {
@@ -143,30 +146,12 @@ const Contact = () => {
   ]
 
   const contactInfo = [
-    {
-      icon: 'fas fa-phone',
-      title: 'Teléfono',
-      value: '+51 922798039',
-      action: 'tel:+51922798039'
-    },
-    {
-      icon: 'fas fa-envelope',
-      title: 'Email',
-      value: 'djdang45@gmail.com',
-      action: 'mailto:djdang45@gmail.com'
-    },
-    {
-      icon: 'fas fa-map-marker-alt',
-      title: 'Ubicación',
-      value: 'Lima, Comas',
-      action: '#'
-    },
-    {
-      icon: 'fas fa-clock',
-      title: 'Horarios',
-      value: 'Lun-Dom: 9:00 AM - 11:00 PM',
-      action: '#'
-    }
+    { icon: 'fas fa-phone', title: t('contact.info.phone'), value: '+51 922798039', action: 'tel:+51922798039' },
+    { icon: 'fas fa-envelope', title: t('contact.info.email'), value: 'djdang45@gmail.com', action: 'mailto:djdang45@gmail.com' },
+    { icon: 'fas fa-map-marker-alt', title: t('contact.info.location'), value: t('contact.locationValue'), action: '#' },
+    ...(t('contact.hoursValue')
+      ? [{ icon: 'fas fa-clock', title: t('contact.info.hours'), value: t('contact.hoursValue'), action: '#' }]
+      : [])
   ]
 
   return (
@@ -181,11 +166,10 @@ const Contact = () => {
           className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6 pb-1 leading-tight">
-            <span className="text-gradient">Contáctame</span>
+            <span className="text-gradient">{t('contact.title')}</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            ¿Listo para hacer de tu evento algo inolvidable? 
-            Contáctame y conversemos sobre tus ideas.
+            {t('contact.subtitle')}
           </p>
         </motion.div>
 
@@ -198,7 +182,7 @@ const Contact = () => {
             className="bg-dj-gray rounded-2xl p-8"
           >
             <h2 className="text-2xl font-dj font-bold text-dj-gold mb-6">
-              Envíame un Mensaje
+              {t('contact.formTitle')}
             </h2>
 
             {submitSuccess && (
@@ -208,7 +192,7 @@ const Contact = () => {
                 className="bg-green-500/20 border border-green-500 text-green-400 p-4 rounded-lg mb-6 flex items-center"
               >
                 <i className="fas fa-check-circle mr-3 text-xl"></i>
-                <span>¡Mensaje enviado con éxito! Te responderé pronto.</span>
+                <span>{t('contact.success')}</span>
               </motion.div>
             )}
 
@@ -227,7 +211,7 @@ const Contact = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Nombre Completo *
+                    {t('contact.name')}
                   </label>
                   <input
                     type="text"
@@ -236,12 +220,12 @@ const Contact = () => {
                     onChange={handleInputChange}
                     required
                     className="w-full px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-dj-gold transition-colors"
-                    placeholder="Tu nombre"
+                    placeholder={t('contact.namePh')}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Teléfono
+                    {t('contact.phone')}
                   </label>
                   <input
                     type="tel"
@@ -250,7 +234,7 @@ const Contact = () => {
                     onChange={handleInputChange}
                     required
                     className="w-full px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-dj-gold transition-colors"
-                    placeholder="+51 999 999 999"
+                    placeholder={t('contact.phonePh')}
                   />
                 </div>
               </div>
@@ -258,7 +242,7 @@ const Contact = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Tipo de Evento *
+                    {t('contact.eventType')}
                   </label>
                   <select
                     name="eventType"
@@ -267,39 +251,38 @@ const Contact = () => {
                     required
                     className="w-full px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white focus:outline-none focus:border-dj-gold transition-colors"
                   >
-                    <option value="">Selecciona un tipo</option>
-                    <option value="boda">Boda</option>
-                    <option value="cumpleanos">Cumpleaños</option>
-                    <option value="corporativo">Evento Corporativo</option>
-                    <option value="infantil">Evento Infantil</option>
-                    <option value="privado">Fiesta Privada</option>
-                    <option value="otro">Otro</option>
+                    <option value="">{t('contact.eventTypePh')}</option>
+                    {EVENT_TYPE_KEYS.map(key => (
+                      <option key={key} value={key}>{t(`contact.eventTypes.${key}`)}</option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
+                {isEs && (
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Paquete *
+                    {t('contact.package')}
                   </label>
                   <select
                     name="packageType"
                     value={formData.packageType}
                     onChange={handleInputChange}
-                    required
+                    required={isEs}
                     className="w-full px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white focus:outline-none focus:border-dj-gold transition-colors"
                   >
-                    <option value="">Selecciona un paquete</option>
+                    <option value="">{t('contact.packagePh')}</option>
                     <option value="solo-dj">Paquete Solo DJ - S/. 250</option>
                     <option value="pack-principal">Pack Principal - S/. 399</option>
                     <option value="pack-fiesta">Pack Fiesta - S/. 499</option>
                   </select>
                 </div>
+                )}
 
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Fecha del Evento
+                    {t('contact.date')}
                   </label>
                   <DatePicker
                     name="date"
@@ -311,7 +294,7 @@ const Contact = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Mensaje *
+                  {t('contact.message')}
                 </label>
                 <textarea
                   name="message"
@@ -320,7 +303,7 @@ const Contact = () => {
                   required
                   rows="5"
                   className="w-full px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-dj-gold transition-colors resize-none"
-                  placeholder="Cuéntame sobre tu evento, tus ideas y cualquier detalle especial que tengas en mente..."
+                  placeholder={t('contact.messagePh')}
                 />
               </div>
 
@@ -334,12 +317,12 @@ const Contact = () => {
                 {isSubmitting ? (
                   <>
                     <i className="fas fa-spinner fa-spin mr-2"></i>
-                    Enviando...
+                    {t('contact.sending')}
                   </>
                 ) : (
                   <>
                     <i className="fas fa-paper-plane mr-2"></i>
-                    Enviar Mensaje
+                    {t('contact.send')}
                   </>
                 )}
               </motion.button>
@@ -356,7 +339,7 @@ const Contact = () => {
             {/* Contact Information */}
             <div className="bg-dj-gray rounded-2xl p-8">
               <h2 className="text-2xl font-dj font-bold text-dj-gold mb-6">
-                Información de Contacto
+                {t('contact.infoTitle')}
               </h2>
               <div className="space-y-6">
                 {contactInfo.map((info, index) => (
@@ -387,7 +370,7 @@ const Contact = () => {
             {/* Social Media */}
             <div className="bg-dj-gray rounded-2xl p-8">
               <h2 className="text-2xl font-dj font-bold text-dj-gold mb-6">
-                Sígueme en Redes Sociales
+                {t('contact.socialTitle')}
               </h2>
               <div className="grid grid-cols-2 gap-4">
                 {socialLinks.map((social, index) => (
@@ -413,13 +396,13 @@ const Contact = () => {
             {/* Quick Contact */}
             <div className="bg-gradient-to-r from-dj-gold/10 to-dj-electric-blue/10 rounded-2xl p-8 border border-dj-gold/20">
               <h3 className="text-xl font-dj font-bold text-dj-gold mb-4">
-                ¿Necesitas una respuesta rápida?
+                {t('contact.quickTitle')}
               </h3>
               <p className="text-gray-300 mb-6">
-                Para consultas urgentes, puedes contactarme directamente por WhatsApp.
+                {t('contact.quickText')}
               </p>
               <motion.a
-                href="https://wa.me/+1234567890"
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
@@ -427,13 +410,14 @@ const Contact = () => {
                 className="inline-flex items-center bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors"
               >
                 <i className="fab fa-whatsapp mr-2 text-xl"></i>
-                WhatsApp Rápido
+                {t('contact.quickButton')}
               </motion.a>
             </div>
           </motion.div>
         </div>
 
-        {/* Map Section */}
+        {/* Map Section (solo ES: el mapa es de Lima) */}
+        {isEs && (
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -442,13 +426,13 @@ const Contact = () => {
         >
               <div className="bg-dj-gray rounded-2xl p-8">
                 <h2 className="text-2xl font-dj font-bold text-dj-gold mb-6 text-center">
-                  Zona de Cobertura
+                  {t('contact.coverageTitle')}
                 </h2>
                 <div className="rounded-lg overflow-hidden border border-gray-700">
                   {/* Responsive iframe map centered on Comas, Lima, Peru. */}
                   <div className="w-full h-64 sm:h-80 md:h-96">
                     <iframe
-                      title="Mapa - Zona de Cobertura (Comas, Lima)"
+                      title={t('contact.mapTitle')}
                       src={mapSrc}
                       width="100%"
                       height="100%"
@@ -459,11 +443,12 @@ const Contact = () => {
                     />
                   </div>
                       <div className="p-4 bg-dj-light-gray text-center">
-                        <p className="text-gray-300 mb-1">Zoom y navegación disponibles sobre el mapa.</p>
+                        <p className="text-gray-300 mb-1">{t('contact.mapHint')}</p>
                       </div>
                 </div>
               </div>
         </motion.div>
+        )}
       </div>
     </section>
   )

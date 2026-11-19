@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { mixes } from '../data/mixes'
+import { useI18n } from '../i18n'
 
 // Devuelve { platform, src, height } o null si la URL no es soportada.
 export const getMixEmbed = (url) => {
@@ -70,6 +71,7 @@ const MixCard = ({ mix }) => {
 }
 
 const Mixes = () => {
+  const { t } = useI18n()
   const valid = mixes.filter(m => getMixEmbed(m.url))
   if (!valid.length) return null
 
@@ -84,10 +86,10 @@ const Mixes = () => {
           className="text-center mb-10"
         >
           <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6 pb-1 leading-tight">
-            <span className="text-gradient">Mixes</span>
+            <span className="text-gradient">{t('mixes.title')}</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Dale play y escucha cómo suena una noche con DJ TEFFO.
+            {t('mixes.subtitle')}
           </p>
         </motion.div>
         <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { genres } from '../data/genres'
+import { useI18n } from '../i18n'
 import { mixes } from '../data/mixes'
 import { getMixEmbed } from './Mixes'
 
@@ -16,6 +17,7 @@ const scrollTo = (e, id) => {
 const hasMixes = mixes.some(m => getMixEmbed(m.url))
 
 const Hero = () => {
+  const { t } = useI18n()
   const heroRef = useRef(null)
 
   useEffect(() => {
@@ -168,7 +170,7 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto"
           >
-            Transformando momentos ordinarios en experiencias extraordinarias
+            {t('hero.tagline')}
             <br />
             <span className="text-dj-gold font-semibold">
               {genres.slice(0, 5).map(g => g.name).join(' • ')}
@@ -189,7 +191,7 @@ const Hero = () => {
                 className="btn-primary text-lg px-8 py-4 flex items-center space-x-2"
               >
                 <i className="fas fa-headphones" aria-hidden="true"></i>
-                <span>Escucha mis mixes</span>
+                <span>{t('hero.ctaMixes')}</span>
               </a>
             )}
 
@@ -199,7 +201,7 @@ const Hero = () => {
               className="btn-secondary text-lg px-6 py-4 flex items-center space-x-2"
             >
               <i className="fas fa-calendar-check" aria-hidden="true"></i>
-              <span>Reservar</span>
+              <span>{t('hero.ctaBook')}</span>
             </a>
           </motion.div>
         </motion.div>

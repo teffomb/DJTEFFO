@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { visibleStats as stats } from '../data/stats'
+import { useI18n } from '../i18n'
 
 const About = () => {
+  const { t } = useI18n()
   const [bgPos, setBgPos] = useState('75% 40%')
   const audioRef = useRef(null)
   const audioButtonRef = useRef(null)
@@ -92,11 +94,10 @@ const About = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6">
-            <span className="text-gradient">Sobre Mí</span>
+            <span className="text-gradient">{t('about.title')}</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Apasionado por la música y el entretenimiento, creando experiencias únicas 
-            que hacen que cada evento sea inolvidable.
+            {t('about.subtitle')}
           </p>
         </motion.div>
 
@@ -139,9 +140,9 @@ const About = () => {
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className="absolute -top-3 -right-3 w-12 h-12 bg-dj-gold rounded-full flex items-center justify-center shadow-lg focus:outline-none z-20"
-                aria-label={isPlaying ? 'Detener audio' : 'Reproducir audio'}
+                aria-label={isPlaying ? t('about.audioStop') : t('about.audioPlay')}
                 aria-pressed={isPlaying}
-                title={isPlaying ? 'Detener audio' : 'Reproducir audio'}
+                title={isPlaying ? t('about.audioStop') : t('about.audioPlay')}
               >
                 <i className="fas fa-music text-dj-dark text-lg"></i>
               </motion.button>
@@ -149,7 +150,7 @@ const About = () => {
 
             {audioError && (
               <p role="alert" className="text-sm text-gray-300">
-                No se pudo reproducir el audio. Vuelve a intentarlo.
+                {t('about.audioError')}
               </p>
             )}
 
@@ -157,17 +158,8 @@ const About = () => {
               <h3 className="text-2xl font-dj font-bold text-dj-gold">
                 DJ TEFFO
               </h3>
-              <p className="text-gray-300 leading-relaxed">
-                Con más de 5 años de experiencia en la industria del entretenimiento, 
-                he tenido el privilegio de ser parte de cientos de momentos especiales. 
-                Desde bodas íntimas hasta grandes eventos corporativos, cada ocasión 
-                es una oportunidad para crear magia a través de la música.
-              </p>
-              <p className="text-gray-300 leading-relaxed">
-                Mi pasión por la música y mi compromiso con la excelencia me han 
-                permitido construir una reputación sólida en el mercado, ofreciendo 
-                no solo música de calidad, sino una experiencia completa de entretenimiento.
-              </p>
+              <p className="text-gray-300 leading-relaxed">{t('about.p1')}</p>
+              <p className="text-gray-300 leading-relaxed">{t('about.p2')}</p>
             </div>
           </motion.div>
 
@@ -183,7 +175,7 @@ const About = () => {
             {stats.length > 0 && <div className="grid grid-cols-2 gap-6">
               {stats.map((stat, index) => (
                 <motion.div
-                  key={stat.label}
+                  key={stat.id}
                   initial={{ opacity: 0, scale: 0.8 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -194,7 +186,7 @@ const About = () => {
                     {stat.value}
                   </div>
                   <div className="text-sm text-gray-300">
-                    {stat.label}
+                    {t(`stats.${stat.id}`)}
                   </div>
                 </motion.div>
               ))}
@@ -203,31 +195,10 @@ const About = () => {
             {/* Features */}
             <div className="space-y-4">
               <h4 className="text-xl font-dj font-semibold text-dj-gold mb-6">
-                ¿Por qué elegirme?
+                {t('about.whyTitle')}
               </h4>
 
-              {[
-                {
-                  icon: 'fas fa-headphones',
-                  title: 'Equipo Profesional',
-                  description: 'Sistema de sonido de alta calidad y equipamiento de última generación'
-                },
-                {
-                  icon: 'fas fa-music',
-                  title: 'Música Diversa',
-                  description: 'Repertorio amplio que incluye todos los géneros y épocas'
-                },
-                {
-                  icon: 'fas fa-clock',
-                  title: 'Puntualidad',
-                  description: 'Llegada anticipada para preparar todo perfectamente'
-                },
-                {
-                  icon: 'fas fa-heart',
-                  title: 'Atención Personalizada',
-                  description: 'Cada evento es único y se adapta a tus necesidades específicas'
-                }
-              ].map((feature, index) => (
+              {['fas fa-headphones', 'fas fa-music', 'fas fa-clock', 'fas fa-heart'].map((icon, index) => ({ icon, ...t('about.features')[index] })).map((feature, index) => (
                 <motion.div
                   key={feature.title}
                   initial={{ opacity: 0, x: 30 }}

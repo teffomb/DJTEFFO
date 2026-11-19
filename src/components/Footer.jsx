@@ -1,33 +1,26 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useI18n } from '../i18n'
 
 const Footer = () => {
+  const { t, lang } = useI18n()
   const currentYear = new Date().getFullYear()
 
+  const serviceLabels = t('footer.serviceLinks')
   const footerLinks = {
-    servicios: [
-      { name: 'Bodas', path: '/#services' },
-      { name: 'Cumpleaños', path: '/#services' },
-      { name: 'Eventos Corporativos', path: '/#services' },
-      { name: 'Eventos Infantiles', path: '/#services' }
-    ],
+    servicios: serviceLabels.map(name => ({ name, path: '/#services' })),
     empresa: [
-      { name: 'Sobre Mí', path: '/#about' },
-      { name: 'Galería', path: '/#gallery' },
-      { name: 'Testimonios', path: '/#testimonials' },
-      { name: 'Precios', path: '/#pricing' }
-    ],
-    contacto: [
-      { name: 'Contacto', path: '/#contact' },
-      { name: 'WhatsApp', path: 'https://wa.me/+1234567890' },
-      { name: 'Instagram', path: 'https://instagram.com/djprofessional' },
-      { name: 'Facebook', path: 'https://facebook.com/djprofessional' }
+      { name: t('footer.companyLinks.about'), path: '/#about' },
+      { name: t('footer.companyLinks.gallery'), path: '/#gallery' },
+      { name: t('footer.companyLinks.testimonials'), path: '/#testimonials' },
+      // ES: Precios. EN: sin precios fijos → formulario de contacto.
+      { name: t('footer.companyLinks.pricing'), path: lang === 'es' ? '/#pricing' : '/#contact' }
     ]
   }
 
   const socialLinks = [
-    { icon: 'fab fa-whatsapp', url: 'https://wa.me/51922798039?text=Hola%20deseo%20m%C3%A1s%20informaci%C3%B3n%20sobre%20sus%20servicios%20de%20DJ%20%F0%9F%98%81', color: 'hover:bg-green-500' },
+    { icon: 'fab fa-whatsapp', url: `https://wa.me/51922798039?text=${encodeURIComponent(t('contact.whatsappMsg'))}`, color: 'hover:bg-green-500' },
     { icon: 'fab fa-instagram', url: 'https://www.instagram.com/idk.teffo/', color: 'hover:bg-pink-500' },
     { icon: 'fab fa-youtube', url: 'https://www.youtube.com/@DjTeffo-in5mt', color: 'hover:bg-red-600' },
     { icon: 'fab fa-soundcloud', url: 'https://soundcloud.com/djteffo', color: 'hover:bg-orange-500' }
@@ -56,9 +49,8 @@ const Footer = () => {
                 </span>
               </div>
                              <p className="text-gray-300 mb-6 leading-relaxed">
-                 Transformando momentos ordinarios en experiencias extraordinarias. 
-                 Música de calidad y entretenimiento garantizado para todos tus eventos con DJ TEFFO.
-               </p>
+                {t('footer.about')}
+              </p>
               <div className="flex space-x-4">
                 {socialLinks.map((social, index) => (
                   <motion.a
@@ -87,7 +79,7 @@ const Footer = () => {
               viewport={{ once: true }}
             >
               <h3 className="text-lg font-dj font-bold text-dj-gold mb-6">
-                Servicios
+                {t('footer.services')}
               </h3>
               <ul className="space-y-3">
                 {footerLinks.servicios.map((link, index) => (
@@ -117,7 +109,7 @@ const Footer = () => {
               viewport={{ once: true }}
             >
               <h3 className="text-lg font-dj font-bold text-dj-gold mb-6">
-                Empresa
+                {t('footer.company')}
               </h3>
               <ul className="space-y-3">
                 {footerLinks.empresa.map((link, index) => (
@@ -147,7 +139,7 @@ const Footer = () => {
               viewport={{ once: true }}
             >
               <h3 className="text-lg font-dj font-bold text-dj-gold mb-6">
-                Contacto
+                {t('footer.contact')}
               </h3>
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
@@ -171,7 +163,7 @@ const Footer = () => {
                     <i className="fas fa-map-marker-alt text-dj-dark text-sm"></i>
                   </div>
                   <span className="text-white text-sm">
-                    Lima, Comas
+                    {t('footer.location')}
                   </span>
                 </div>
               </div>
@@ -189,16 +181,15 @@ const Footer = () => {
         >
           <div className="text-center">
             <h3 className="text-xl font-dj font-bold text-dj-gold mb-4">
-              ¡Mantente Conectado!
+              {t('footer.newsletterTitle')}
             </h3>
                          <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-               Suscríbete para recibir ofertas especiales, consejos para eventos 
-               y las últimas novedades de DJ TEFFO.
+               {t('footer.newsletterText')}
              </p>
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
               <input
                 type="email"
-                placeholder="Tu email"
+                placeholder={t('footer.emailPh')}
                 className="flex-1 px-4 py-3 bg-dj-light-gray border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-dj-gold transition-colors"
               />
               <motion.button
@@ -206,7 +197,7 @@ const Footer = () => {
                 whileTap={{ scale: 0.95 }}
                 className="btn-primary"
               >
-                Suscribirse
+                {t('footer.subscribe')}
               </motion.button>
             </div>
           </div>
@@ -222,14 +213,14 @@ const Footer = () => {
         >
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                          <div className="text-gray-300 text-sm">
-               © {currentYear} DJ TEFFO. Todos los derechos reservados.
+               © {currentYear} DJ TEFFO. {t('footer.rights')}
              </div>
             <div className="flex space-x-6 text-sm">
               <Link to="/privacy" className="text-gray-300 hover:text-dj-gold transition-colors">
-                Política de Privacidad
+                {t('footer.privacy')}
               </Link>
               <Link to="/terms" className="text-gray-300 hover:text-dj-gold transition-colors">
-                Términos de Servicio
+                {t('footer.terms')}
               </Link>
             </div>
           </div>
@@ -244,6 +235,7 @@ const Footer = () => {
         whileTap={{ scale: 0.9 }}
         transition={{ duration: 0.3 }}
         viewport={{ once: true }}
+        aria-label={t('footer.backToTop')}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className="fixed bottom-8 right-8 w-12 h-12 bg-dj-gold rounded-full flex items-center justify-center text-dj-dark hover:bg-yellow-400 transition-colors shadow-lg z-50"
       >

@@ -3,10 +3,12 @@ import { motion, useInView } from 'framer-motion'
 import GalleryVideo, { VideoPoster } from './GalleryVideo'
 
 import { galleryCategories, galleryVideos } from '../data/galleryVideos'
+import { useI18n } from '../i18n'
 
 const AUTOPLAY_MS = 5000
 
 const Gallery = () => {
+  const { t } = useI18n()
   const carouselRef = useRef(null)
   const isInView = useInView(carouselRef, { amount: 0.25 })
   const [category, setCategory] = useState('Todos')
@@ -16,6 +18,10 @@ const Gallery = () => {
   const [hasFocus, setHasFocus] = useState(false)
   const [autoplayEnabled, setAutoplayEnabled] = useState(true)
   const [pageVisible, setPageVisible] = useState(() => !document.hidden)
+  // Títulos autogenerados (videos de Cloudinary) se traducen; los de videos.js se muestran tal cual.
+  const videoTitle = (video) => video.autoTitle
+    ? t('gallery.videoTitle', { category: t(`gallery.categories.${video.category}`) || video.category, n: video.autoTitle })
+    : video.title
   const videos = category === 'Todos'
     ? galleryVideos
     : galleryVideos.filter(video => video.category === category)
@@ -62,14 +68,14 @@ const Gallery = () => {
         className="text-center mb-10"
       >
         <h2 className="text-4xl md:text-5xl font-dj font-bold mb-6 pb-1 leading-tight">
-          <span className="text-gradient">Galería</span>
+          <span className="text-gradient">{t('gallery.title')}</span>
         </h2>
         <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-          Momentos especiales capturados en eventos inolvidables.
+          {t('gallery.subtitle')}
         </p>
       </motion.div>
 
-      <div className="flex flex-wrap gap-3 justify-center mb-8" role="group" aria-label="Categorías de videos">
+      <div className="flex flex-wrap gap-3 justify-center mb-8" role="group" aria-label={t('gallery.filtersAria')}>
         {galleryCategories.map(item => (
           <button
             key={item}
@@ -82,7 +88,7 @@ const Gallery = () => {
               setIsPlaying(false)
             }}
           >
-            {item}
+            {item === 'Todos' ? t('gallery.all') : (t(`gallery.categories.${item}`) || item)}
           </button>
         ))}
       </div>
@@ -90,8 +96,8 @@ const Gallery = () => {
       <div
         ref={carouselRef}
         role="region"
-        aria-roledescription="carrusel"
-        aria-label="Videos de eventos"
+        aria-roledescription={t('gallery.carouselRole')}
+        aria-label={t('gallery.carouselAria')}
         className="max-w-4xl mx-auto"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -104,7 +110,7 @@ const Gallery = () => {
           <button
             type="button"
             onClick={() => move(-1)}
-            aria-label={`Ver video anterior: ${previousVideo.title}`}
+            aria-label={t('gallery.prevVideoNamed', { title: previousVideo.title })}
             className="hidden md:block relative shrink-0 w-28 lg:w-36 aspect-[9/16] rounded-2xl overflow-hidden border border-white/15 bg-black opacity-60 hover:opacity-100 transition-opacity"
           >
             <VideoPoster poster={previousVideo.poster} title="" type={previousVideo.type} className="w-full h-full object-cover" />
@@ -114,14 +120,14 @@ const Gallery = () => {
             <div className="absolute -inset-3 bg-dj-gold/15 blur-2xl rounded-[2rem] pointer-events-none" />
             <div className="relative rounded-2xl overflow-hidden bg-black border border-white/15 shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
               {/* Immediately unmount the old player to stop and release its video. */}
-              <GalleryVideo key={currentVideo.id} {...currentVideo} onPlaybackChange={setIsPlaying} />
+              <GalleryVideo key={currentVideo.id} {...currentVideo} title={videoTitle(currentVideo)} onPlaybackChange={setIsPlaying} />
             </div>
           </div>
 
           <button
             type="button"
             onClick={() => move(1)}
-            aria-label={`Ver siguiente video: ${nextVideo.title}`}
+            aria-label={t('gallery.nextVideoNamed', { title: nextVideo.title })}
             className="hidden md:block relative shrink-0 w-28 lg:w-36 aspect-[9/16] rounded-2xl overflow-hidden border border-white/15 bg-black opacity-60 hover:opacity-100 transition-opacity"
           >
             <VideoPoster poster={nextVideo.poster} title="" type={nextVideo.type} className="w-full h-full object-cover" />
@@ -129,25 +135,25 @@ const Gallery = () => {
         </div>
 
         <div className="flex items-center justify-center gap-5 mt-6">
-          <button type="button" onClick={() => move(-1)} aria-label="Video anterior" className="w-11 h-11 shrink-0 rounded-full bg-white/10 hover:bg-white/20 text-xl">
+          <button type="button" onClick={() => move(-1)} aria-label={t('gallery.prevVideo')} className="w-11 h-11 shrink-0 rounded-full bg-white/10 hover:bg-white/20 text-xl">
             <span aria-hidden="true">←</span>
           </button>
           <div className="text-center min-w-0" aria-live={canAdvance ? 'off' : 'polite'} aria-atomic="true">
-            <p className="text-sm text-white">{currentVideo.title}</p>
-            <p className="text-sm text-gray-300 mt-1">Video {activeIndex + 1} de {videos.length}</p>
+            <p className="text-sm text-white">{videoTitle(currentVideo)}</p>
+            <p className="text-sm text-gray-300 mt-1">{t('gallery.counter', { n: activeIndex + 1, total: videos.length })}</p>
           </div>
-          <button type="button" onClick={() => move(1)} aria-label="Siguiente video" className="w-11 h-11 shrink-0 rounded-full bg-white/10 hover:bg-white/20 text-xl">
+          <button type="button" onClick={() => move(1)} aria-label={t('gallery.nextVideo')} className="w-11 h-11 shrink-0 rounded-full bg-white/10 hover:bg-white/20 text-xl">
             <span aria-hidden="true">→</span>
           </button>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-1 max-w-2xl mx-auto mt-3" role="group" aria-label="Elegir video">
+        <div className="flex flex-wrap justify-center gap-1 max-w-2xl mx-auto mt-3" role="group" aria-label={t('gallery.pickVideo')}>
           {videos.map((video, index) => (
             <button
               key={video.id}
               type="button"
               onClick={() => goToSlide(index)}
-              aria-label={`Ir al video ${index + 1}: ${video.title}`}
+              aria-label={t('gallery.goTo', { n: index + 1, title: videoTitle(video) })}
               aria-current={index === activeIndex ? 'true' : undefined}
               className="flex items-center justify-center w-8 h-9"
             >
@@ -162,7 +168,7 @@ const Gallery = () => {
           onClick={() => setAutoplayEnabled(enabled => !enabled)}
           className="px-4 py-2 text-sm text-gray-300 rounded-lg hover:bg-white/10 hover:text-white"
         >
-          {autoplayEnabled ? 'Pausar avance automático' : 'Activar avance automático'}
+          {autoplayEnabled ? t('gallery.pauseAuto') : t('gallery.resumeAuto')}
         </button>
       </div>
     </div>
