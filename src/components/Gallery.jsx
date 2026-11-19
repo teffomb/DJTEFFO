@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
-import GalleryVideo from './GalleryVideo'
+import GalleryVideo, { VideoPoster } from './GalleryVideo'
 
 import { galleryCategories, galleryVideos } from '../data/galleryVideos'
 
@@ -107,10 +107,10 @@ const Gallery = () => {
             aria-label={`Ver video anterior: ${previousVideo.title}`}
             className="hidden md:block relative shrink-0 w-28 lg:w-36 aspect-[9/16] rounded-2xl overflow-hidden border border-white/15 bg-black opacity-60 hover:opacity-100 transition-opacity"
           >
-            <img src={previousVideo.poster} alt="" width="360" height="640" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            <VideoPoster poster={previousVideo.poster} title="" type={previousVideo.type} className="w-full h-full object-cover" />
           </button>
 
-          <div className="relative w-full max-w-[22.5rem] md:max-w-[min(22.5rem,32svh)] min-w-0">
+          <div className={`relative w-full min-w-0 ${currentVideo.orientation === 'landscape' ? 'max-w-xl' : 'max-w-[22.5rem] md:max-w-[min(22.5rem,32svh)]'}`}>
             <div className="absolute -inset-3 bg-dj-gold/15 blur-2xl rounded-[2rem] pointer-events-none" />
             <div className="relative rounded-2xl overflow-hidden bg-black border border-white/15 shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
               {/* Immediately unmount the old player to stop and release its video. */}
@@ -124,7 +124,7 @@ const Gallery = () => {
             aria-label={`Ver siguiente video: ${nextVideo.title}`}
             className="hidden md:block relative shrink-0 w-28 lg:w-36 aspect-[9/16] rounded-2xl overflow-hidden border border-white/15 bg-black opacity-60 hover:opacity-100 transition-opacity"
           >
-            <img src={nextVideo.poster} alt="" width="360" height="640" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            <VideoPoster poster={nextVideo.poster} title="" type={nextVideo.type} className="w-full h-full object-cover" />
           </button>
         </div>
 

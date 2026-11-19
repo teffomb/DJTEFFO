@@ -1,3 +1,6 @@
+import { externalVideos } from './videos'
+import { parseVideoUrl } from '../utils/videoEmbed'
+
 const CLOUDINARY_BASE = 'https://res.cloudinary.com/w4d4usk4/video/upload'
 
 // Preserve each upload's version and public ID for both video and poster URLs.
@@ -30,14 +33,47 @@ const uploads = [
   ] },
 ]
 
-export const galleryCategories = ['Todos', ...uploads.map(({ category }) => category)]
+const BASE = import.meta.env.BASE_URL
+const resolvePoster = (p) => (!p ? undefined : /^(https?:)?\/\//.test(p) ? p : `${BASE}${p.replace(/^\//, '')}`)
 
-export const galleryVideos = uploads.flatMap(({ category, assets }) =>
+const cloudinaryVideos = uploads.flatMap(({ category, assets }) =>
   assets.map((asset, index) => ({
     id: asset,
     category,
     title: `${category} · Video ${index + 1}`,
+    type: 'mp4',
+    orientation: 'portrait',
+    featured: false,
     src: `${CLOUDINARY_BASE}/c_limit,w_720,h_1280,vc_h264,q_auto,f_mp4/${asset}.mov`,
     poster: `${CLOUDINARY_BASE}/so_0,c_limit,w_360,h_640,q_auto,f_auto/${asset}.jpg`,
   }))
 )
+
+const external = externalVideos.flatMap((v) => {
+  const parsed = parseVideoUrl(v.url)
+  if (!parsed) {
+    if (import.meta.env.DEV) console.warn('[videos.js] URL de video no soportada, se omite:', v.url)
+    return []
+  }
+  return [{
+    id: v.url,
+    category: v.category,
+    title: v.title,
+    featured: !!v.featured,
+    ...parsed,
+    orientation: v.orientation || parsed.orientation,
+    poster: resolvePoster(v.poster) || parsed.poster,
+  }]
+})
+
+// Destacados primero (orden estable dentro de cada grupo).
+export const galleryVideos = [...external, ...cloudinaryVideos]
+  .map((v, i) => ({ v, i }))
+  .sort((a, b) => (Number(b.v.featured) - Number(a.v.featured)) || (a.i - b.i))
+  .map(({ v }) => v)
+
+// Solo categorías que tienen al menos un video.
+export const galleryCategories = [
+  'Todos',
+  ...[...new Set(galleryVideos.map(v => v.category))],
+]
